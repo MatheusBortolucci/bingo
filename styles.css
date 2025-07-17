@@ -1,0 +1,655 @@
+/* Reset e configurações básicas */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Georgia', serif;
+    background: linear-gradient(135deg, #fce4ec 0%, #f8bbd9 100%);
+    min-height: 100vh;
+    padding: 20px;
+    overflow-x: auto;
+}
+
+/* Header */
+header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+header h1 {
+    color: #d81b60;
+    font-size: 2.5rem;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 10px;
+}
+
+header h2 {
+    color: #ad1457;
+    font-size: 1.8rem;
+    font-weight: normal;
+}
+
+/* Controles */
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+}
+
+.btn-primary, .btn-secondary, .btn-tertiary {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.btn-primary {
+    background: linear-gradient(45deg, #e91e63, #f06292);
+    color: white;
+}
+
+.btn-secondary {
+    background: linear-gradient(45deg, #8e24aa, #ba68c8);
+    color: white;
+}
+
+.btn-tertiary {
+    background: linear-gradient(45deg, #ff7043, #ffab91);
+    color: white;
+}
+
+.btn-primary:hover, .btn-secondary:hover, .btn-tertiary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+}
+
+/* Link para sorteio */
+.sorteio-link {
+    text-align: center;
+    margin: 20px 0;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.btn-sorteio-link {
+    font-family: 'Poppins', sans-serif;
+    display: inline-block;
+    padding: 15px 30px;
+    background: linear-gradient(45deg, #ff6b35, #f7931e);
+    color: white;
+    text-decoration: none;
+    border-radius: 25px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    margin-bottom: 10px;
+}
+
+.btn-sorteio-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+    text-decoration: none;
+    color: white;
+}
+
+.sorteio-info {
+    color: #666;
+    font-size: 0.9rem;
+    margin-top: 10px;
+    font-style: italic;
+}
+
+/* Grid de cartelas */
+.cartelas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, 380px);
+    gap: 40px;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 20px;
+    justify-content: center;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+/* Cartela individual */
+.cartela {
+    background: #fef7f7; /* Rosa bem clarinho */
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    page-break-inside: avoid;
+    break-inside: avoid;
+    width: 380px;
+    height: 480px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+.cartela-header {
+    text-align: center;
+    margin-bottom: 15px;
+    position: relative;
+    height: 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.cartela-titulo {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #d81b60;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.cartela-subtitulo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+    letter-spacing: 2px;
+}
+
+.cartela-decoracao {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 10px 0;
+}
+
+.estrela {
+    color: #e91e63;
+    font-size: 1.2rem;
+}
+
+.coracao {
+    color: #e91e63;
+    font-size: 1.5rem;
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* Grid da cartela (5x5) */
+.bingo-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 2px;
+    border: 3px solid #e91e63;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 10px;
+    flex: 1;
+    height: 330px;
+}
+
+.bingo-cell {
+    border: 1px solid #e91e63;
+    padding: 6px 4px;
+    text-align: center;
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: #333;
+    height: 66px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: background-color 0.3s ease;
+    word-wrap: break-word;
+    hyphens: auto;
+    overflow: hidden;
+    line-height: 1.2;
+}
+
+/* Padrão xadrez personalizado: linhas ímpares começam com rosa, pares com vermelho */
+
+/* Primeira linha (1-5): rosa, vermelho, rosa, vermelho, rosa */
+.bingo-cell:nth-child(1), .bingo-cell:nth-child(3), .bingo-cell:nth-child(5) {
+    background: #fce4ec; /* Rosa claro */
+    color: #333;
+    font-weight: 500;
+}
+
+.bingo-cell:nth-child(2), .bingo-cell:nth-child(4) {
+    background: #e91e63; /* Vermelho/Pink */
+    color: white;
+    font-weight: bold;
+}
+
+/* Segunda linha (6-10): vermelho, rosa, vermelho, rosa, vermelho */
+.bingo-cell:nth-child(6), .bingo-cell:nth-child(8), .bingo-cell:nth-child(10) {
+    background: #e91e63; /* Vermelho/Pink */
+    color: white;
+    font-weight: bold;
+}
+
+.bingo-cell:nth-child(7), .bingo-cell:nth-child(9) {
+    background: #fce4ec; /* Rosa claro */
+    color: #333;
+    font-weight: 500;
+}
+
+/* Terceira linha (11-15): rosa, vermelho, rosa (centro), vermelho, rosa */
+.bingo-cell:nth-child(11), .bingo-cell:nth-child(13), .bingo-cell:nth-child(15) {
+    background: #fce4ec; /* Rosa claro */
+    color: #333;
+    font-weight: 500;
+}
+
+.bingo-cell:nth-child(12), .bingo-cell:nth-child(14) {
+    background: #e91e63; /* Vermelho/Pink */
+    color: white;
+    font-weight: bold;
+}
+
+/* Quarta linha (16-20): vermelho, rosa, vermelho, rosa, vermelho */
+.bingo-cell:nth-child(16), .bingo-cell:nth-child(18), .bingo-cell:nth-child(20) {
+    background: #e91e63; /* Vermelho/Pink */
+    color: white;
+    font-weight: bold;
+}
+
+.bingo-cell:nth-child(17), .bingo-cell:nth-child(19) {
+    background: #fce4ec; /* Rosa claro */
+    color: #333;
+    font-weight: 500;
+}
+
+/* Quinta linha (21-25): rosa, vermelho, rosa, vermelho, rosa */
+.bingo-cell:nth-child(21), .bingo-cell:nth-child(23), .bingo-cell:nth-child(25) {
+    background: #fce4ec; /* Rosa claro */
+    color: #333;
+    font-weight: 500;
+}
+
+.bingo-cell:nth-child(22), .bingo-cell:nth-child(24) {
+    background: #e91e63; /* Vermelho/Pink */
+    color: white;
+    font-weight: bold;
+}
+
+.bingo-cell:nth-child(13) {
+    background: #fce4ec; /* Rosa claro - mantém o padrão da linha ímpar */
+    color: #e91e63;
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.bingo-cell:hover:not(.free-space) {
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(233, 30, 99, 0.3);
+}
+
+/* Numeração da cartela */
+.cartela-numero {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: #e91e63;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+/* Estilos para impressão - 1 cartela por página */
+@media print {
+    @page {
+        size: A4;
+        margin: 5mm;
+        /* Remove cabeçalhos e rodapés da impressão */
+        @top-left { content: ""; }
+        @top-right { content: ""; }
+        @top-center { content: ""; }
+        @bottom-left { content: ""; }
+        @bottom-right { content: ""; }
+        @bottom-center { content: ""; }
+    }
+    
+    body {
+        background: white;
+        padding: 0;
+        margin: 0;
+    }
+    
+    header, .controls, .mensagem {
+        display: none !important;
+    }
+    
+    .cartelas-grid {
+        display: block;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .cartela {
+        width: 190mm;
+        height: 250mm;
+        padding: 15mm;
+        margin: 0;
+        background: #fef7f7 !important; /* Rosa bem clarinho */
+        border: 3px solid #e91e63;
+        border-radius: 10mm;
+        box-shadow: none;
+        page-break-after: always;
+        page-break-inside: avoid;
+        transform: none;
+        position: relative;
+    }
+    
+    .cartela:last-child {
+        page-break-after: auto;
+    }
+    
+    .cartela-numero {
+        display: none !important;
+    }
+    
+    .cartela-header {
+        height: 25mm;
+        margin-bottom: 8mm;
+    }
+    
+    .cartela-titulo {
+        font-size: 5mm;
+    }
+    
+    .cartela-subtitulo {
+        font-size: 8mm;
+    }
+    
+    .bingo-grid {
+        height: 180mm;
+        gap: 1mm;
+        border: 2mm solid #e91e63;
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        grid-template-rows: repeat(5, 1fr);
+    }
+    
+    .bingo-cell {
+        font-size: 3.5mm;
+        border: 1mm solid #e91e63;
+        padding: 2mm;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        line-height: 1.2;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    /* Manter padrão xadrez personalizado na impressão */
+    /* Primeira linha: rosa, vermelho, rosa, vermelho, rosa */
+    .bingo-cell:nth-child(1), .bingo-cell:nth-child(3), .bingo-cell:nth-child(5) {
+        background: #fce4ec !important;
+        color: #333 !important;
+    }
+    .bingo-cell:nth-child(2), .bingo-cell:nth-child(4) {
+        background: #e91e63 !important;
+        color: white !important;
+    }
+    
+    /* Segunda linha: vermelho, rosa, vermelho, rosa, vermelho */
+    .bingo-cell:nth-child(6), .bingo-cell:nth-child(8), .bingo-cell:nth-child(10) {
+        background: #e91e63 !important;
+        color: white !important;
+    }
+    .bingo-cell:nth-child(7), .bingo-cell:nth-child(9) {
+        background: #fce4ec !important;
+        color: #333 !important;
+    }
+    
+    /* Terceira linha: rosa, vermelho, rosa (centro), vermelho, rosa */
+    .bingo-cell:nth-child(11), .bingo-cell:nth-child(13), .bingo-cell:nth-child(15) {
+        background: #fce4ec !important;
+        color: #333 !important;
+    }
+    .bingo-cell:nth-child(12), .bingo-cell:nth-child(14) {
+        background: #e91e63 !important;
+        color: white !important;
+    }
+    
+    /* Quarta linha: vermelho, rosa, vermelho, rosa, vermelho */
+    .bingo-cell:nth-child(16), .bingo-cell:nth-child(18), .bingo-cell:nth-child(20) {
+        background: #e91e63 !important;
+        color: white !important;
+    }
+    .bingo-cell:nth-child(17), .bingo-cell:nth-child(19) {
+        background: #fce4ec !important;
+        color: #333 !important;
+    }
+    
+    /* Quinta linha: rosa, vermelho, rosa, vermelho, rosa */
+    .bingo-cell:nth-child(21), .bingo-cell:nth-child(23), .bingo-cell:nth-child(25) {
+        background: #fce4ec !important;
+        color: #333 !important;
+    }
+    .bingo-cell:nth-child(22), .bingo-cell:nth-child(24) {
+        background: #e91e63 !important;
+        color: white !important;
+    }
+    
+    /* Centro especial */
+    .bingo-cell:nth-child(13) {
+        background: #fce4ec !important;
+        color: #e91e63 !important;
+        font-size: 4mm;
+    }
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    header h1 {
+        font-size: 2rem;
+    }
+    
+    header h2 {
+        font-size: 1.4rem;
+    }
+    
+    .cartelas-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        padding: 10px;
+    }
+    
+    .controls {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .cartela {
+        width: 100%;
+        max-width: 380px;
+        height: 430px;
+        padding: 20px;
+    }
+    
+    .bingo-grid {
+        height: 280px;
+    }
+    
+    .bingo-cell {
+        font-size: 0.65rem;
+        height: 56px;
+        padding: 4px 3px;
+    }
+    
+    /* Manter padrão xadrez personalizado no mobile */
+    /* Primeira linha: rosa, vermelho, rosa, vermelho, rosa */
+    .bingo-cell:nth-child(1), .bingo-cell:nth-child(3), .bingo-cell:nth-child(5) {
+        background: #fce4ec;
+        color: #333;
+    }
+    .bingo-cell:nth-child(2), .bingo-cell:nth-child(4) {
+        background: #e91e63;
+        color: white;
+    }
+    
+    /* Segunda linha: vermelho, rosa, vermelho, rosa, vermelho */
+    .bingo-cell:nth-child(6), .bingo-cell:nth-child(8), .bingo-cell:nth-child(10) {
+        background: #e91e63;
+        color: white;
+    }
+    .bingo-cell:nth-child(7), .bingo-cell:nth-child(9) {
+        background: #fce4ec;
+        color: #333;
+    }
+    
+    /* Terceira linha: rosa, vermelho, rosa (centro), vermelho, rosa */
+    .bingo-cell:nth-child(11), .bingo-cell:nth-child(13), .bingo-cell:nth-child(15) {
+        background: #fce4ec;
+        color: #333;
+    }
+    .bingo-cell:nth-child(12), .bingo-cell:nth-child(14) {
+        background: #e91e63;
+        color: white;
+    }
+    
+    /* Quarta linha: vermelho, rosa, vermelho, rosa, vermelho */
+    .bingo-cell:nth-child(16), .bingo-cell:nth-child(18), .bingo-cell:nth-child(20) {
+        background: #e91e63;
+        color: white;
+    }
+    .bingo-cell:nth-child(17), .bingo-cell:nth-child(19) {
+        background: #fce4ec;
+        color: #333;
+    }
+    
+    /* Quinta linha: rosa, vermelho, rosa, vermelho, rosa */
+    .bingo-cell:nth-child(21), .bingo-cell:nth-child(23), .bingo-cell:nth-child(25) {
+        background: #fce4ec;
+        color: #333;
+    }
+    .bingo-cell:nth-child(22), .bingo-cell:nth-child(24) {
+        background: #e91e63;
+        color: white;
+    }
+    
+    /* Centro especial */
+    .bingo-cell:nth-child(13) {
+        background: #fce4ec;
+        color: #e91e63;
+    }
+    
+    .cartela-header {
+        height: 70px;
+    }
+}
+
+/* Para telas muito pequenas */
+@media (max-width: 480px) {
+    body {
+        padding: 10px;
+    }
+    
+    .cartela {
+        width: 100%;
+        max-width: 340px;
+        height: 400px;
+        padding: 15px;
+    }
+    
+    .bingo-grid {
+        height: 260px;
+    }
+    
+    .bingo-cell {
+        font-size: 0.6rem;
+        height: 52px;
+        padding: 3px 2px;
+    }
+    
+    /* Manter padrão xadrez personalizado em telas pequenas */
+    /* Primeira linha: rosa, vermelho, rosa, vermelho, rosa */
+    .bingo-cell:nth-child(1), .bingo-cell:nth-child(3), .bingo-cell:nth-child(5) {
+        background: #fce4ec;
+        color: #333;
+    }
+    .bingo-cell:nth-child(2), .bingo-cell:nth-child(4) {
+        background: #e91e63;
+        color: white;
+    }
+    
+    /* Segunda linha: vermelho, rosa, vermelho, rosa, vermelho */
+    .bingo-cell:nth-child(6), .bingo-cell:nth-child(8), .bingo-cell:nth-child(10) {
+        background: #e91e63;
+        color: white;
+    }
+    .bingo-cell:nth-child(7), .bingo-cell:nth-child(9) {
+        background: #fce4ec;
+        color: #333;
+    }
+    
+    /* Terceira linha: rosa, vermelho, rosa (centro), vermelho, rosa */
+    .bingo-cell:nth-child(11), .bingo-cell:nth-child(13), .bingo-cell:nth-child(15) {
+        background: #fce4ec;
+        color: #333;
+    }
+    .bingo-cell:nth-child(12), .bingo-cell:nth-child(14) {
+        background: #e91e63;
+        color: white;
+    }
+    
+    /* Quarta linha: vermelho, rosa, vermelho, rosa, vermelho */
+    .bingo-cell:nth-child(16), .bingo-cell:nth-child(18), .bingo-cell:nth-child(20) {
+        background: #e91e63;
+        color: white;
+    }
+    .bingo-cell:nth-child(17), .bingo-cell:nth-child(19) {
+        background: #fce4ec;
+        color: #333;
+    }
+    
+    /* Quinta linha: rosa, vermelho, rosa, vermelho, rosa */
+    .bingo-cell:nth-child(21), .bingo-cell:nth-child(23), .bingo-cell:nth-child(25) {
+        background: #fce4ec;
+        color: #333;
+    }
+    .bingo-cell:nth-child(22), .bingo-cell:nth-child(24) {
+        background: #e91e63;
+        color: white;
+    }
+    
+    /* Centro especial */
+    .bingo-cell:nth-child(13) {
+        background: #fce4ec;
+        color: #e91e63;
+    }
+    
+    .cartela-titulo {
+        font-size: 1rem;
+    }
+    
+    .cartela-subtitulo {
+        font-size: 1.2rem;
+    }
+    
+    .cartela-header {
+        height: 65px;
+    }
+}
