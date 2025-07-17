@@ -3,34 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerador de Cartelas de Bingo - Chá de Panela da Mari</title>
+    <title>Sorteio - Chá de Panela da Mari</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
     <header>
-        <h1>🎉 Gerador de Cartelas de Bingo 🎉</h1>
+        <h1>🎲 Sorteio do Bingo</h1>
         <h2>Chá de Panela da Mari</h2>
     </header>
 
     <main>
+        <!-- Controles do Sorteio -->
         <div class="controls">
-            <button id="gerarCartelas" class="btn-primary">Gerar 35 Cartelas</button>
-            <button id="imprimirCartelas" class="btn-secondary">Imprimir (1 por página)</button>
-            <button id="novasCartelas" class="btn-tertiary">Gerar Novas Cartelas</button>
-        </div>
-        
-        <div class="sorteio-link">
-            <a href="sorteio.html" class="btn-sorteio-link" target="_blank">
-                📱 Abrir Sorteio no Celular
-            </a>
-            <p class="sorteio-info">Use o sorteio separadamente no celular durante o evento!</p>
+            <button id="iniciarSorteio" class="btn-primary">Iniciar Sorteio</button>
+            <button id="sortearItem" class="btn-secondary" disabled>Sortear Próximo</button>
+            <button id="reiniciarSorteio" class="btn-tertiary">Reiniciar</button>
         </div>
 
-        <div id="cartelas-container" class="cartelas-grid">
-            <!-- As cartelas serão geradas aqui -->
+        <!-- Item Atual Sorteado -->
+        <div class="item-sorteado-container">
+            <div class="item-atual">
+                <h3>🎯 Item Sorteado:</h3>
+                <div id="itemAtual" class="item-display">
+                    Clique em "Iniciar Sorteio" para começar
+                </div>
+                <div class="contador">
+                    Item <span id="contadorAtual">0</span> de <span id="totalItens">55</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de Itens Sorteados -->
+        <div class="itens-sorteados-container">
+            <div class="header-sorteados">
+                <h3>✅ Itens já Sorteados</h3>
+                <span class="badge-contador">
+                    <span id="contadorSorteados">0</span> sorteados
+                </span>
+            </div>
+            
+            <div id="listaSorteados" class="lista-conferencia">
+                <p class="lista-vazia">Nenhum item sorteado ainda</p>
+            </div>
+        </div>
+
+        <!-- Progresso -->
+        <div class="progresso-container">
+            <div class="progresso-label">Progresso do Sorteio</div>
+            <div class="progresso-bar">
+                <div id="progressoFill" class="progresso-fill"></div>
+            </div>
+            <div class="progresso-texto">
+                <span id="progressoTexto">0% concluído</span>
+            </div>
         </div>
     </main>
+
+    <footer>
+        <p>💕 Feito com amor para o Chá de Panela da Mari</p>
+    </footer>
 
     <script src="script.js"></script>
 </body>

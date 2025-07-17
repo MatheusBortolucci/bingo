@@ -5,52 +5,63 @@
     box-sizing: border-box;
 }
 
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;600;700&family=Poppins:wght@300;400;500;600&display=swap');
+
 body {
-    font-family: 'Georgia', serif;
-    background: linear-gradient(135deg, #fce4ec 0%, #f8bbd9 100%);
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 30%, #f9a8d4 100%);
     min-height: 100vh;
-    padding: 20px;
-    overflow-x: auto;
+    padding: 10px;
+    color: #333;
 }
 
 /* Header */
 header {
     text-align: center;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
+    padding: 20px 10px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 header h1 {
+    font-family: 'Dancing Script', cursive;
     color: #d81b60;
     font-size: 2.5rem;
-    font-weight: bold;
+    font-weight: 700;
     text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-    margin-bottom: 10px;
+    margin-bottom: 5px;
 }
 
 header h2 {
+    font-family: 'Poppins', sans-serif;
     color: #ad1457;
-    font-size: 1.8rem;
-    font-weight: normal;
+    font-size: 1.2rem;
+    font-weight: 400;
 }
 
 /* Controles */
 .controls {
     display: flex;
-    justify-content: center;
-    gap: 15px;
-    margin-bottom: 40px;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding: 0 10px;
 }
 
 .btn-primary, .btn-secondary, .btn-tertiary {
-    padding: 12px 24px;
+    font-family: 'Poppins', sans-serif;
+    padding: 15px 20px;
     border: none;
     border-radius: 25px;
     font-size: 1rem;
-    font-weight: bold;
+    font-weight: 500;
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    width: 100%;
 }
 
 .btn-primary {
@@ -73,583 +84,248 @@ header h2 {
     box-shadow: 0 6px 12px rgba(0,0,0,0.2);
 }
 
-/* Link para sorteio */
-.sorteio-link {
-    text-align: center;
-    margin: 20px 0;
-    padding: 20px;
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: 15px;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+.btn-primary:disabled, .btn-secondary:disabled, .btn-tertiary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
 }
 
-.btn-sorteio-link {
-    font-family: 'Poppins', sans-serif;
-    display: inline-block;
-    padding: 15px 30px;
-    background: linear-gradient(45deg, #ff6b35, #f7931e);
-    color: white;
-    text-decoration: none;
-    border-radius: 25px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    margin-bottom: 10px;
-}
-
-.btn-sorteio-link:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0,0,0,0.2);
-    text-decoration: none;
-    color: white;
-}
-
-.sorteio-info {
-    color: #666;
-    font-size: 0.9rem;
-    margin-top: 10px;
-    font-style: italic;
-}
-
-/* Grid de cartelas */
-.cartelas-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, 380px);
-    gap: 40px;
-    max-width: 1600px;
-    margin: 0 auto;
-    padding: 20px;
-    justify-content: center;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-}
-
-/* Cartela individual */
-.cartela {
-    background: #fef7f7; /* Rosa bem clarinho */
-    border-radius: 15px;
-    padding: 25px;
+/* Item Sorteado */
+.item-sorteado-container {
+    background: white;
+    border-radius: 20px;
+    padding: 25px 20px;
+    margin-bottom: 20px;
     box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-    page-break-inside: avoid;
-    break-inside: avoid;
-    width: 380px;
-    height: 480px;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-}
-
-.cartela-header {
     text-align: center;
-    margin-bottom: 15px;
-    position: relative;
-    height: 80px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
 }
 
-.cartela-titulo {
-    font-size: 1.2rem;
-    font-weight: bold;
+.item-atual h3 {
     color: #d81b60;
-    margin-bottom: 5px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+    font-weight: 600;
 }
 
-.cartela-subtitulo {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #333;
-    letter-spacing: 2px;
-}
-
-.cartela-decoracao {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: 10px 0;
-}
-
-.estrela {
-    color: #e91e63;
-    font-size: 1.2rem;
-}
-
-.coracao {
-    color: #e91e63;
-    font-size: 1.5rem;
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-}
-
-/* Grid da cartela (5x5) */
-.bingo-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 2px;
+.item-display {
+    background: linear-gradient(135deg, #fce4ec, #f8bbd9);
     border: 3px solid #e91e63;
-    border-radius: 10px;
-    overflow: hidden;
-    margin-top: 10px;
-    flex: 1;
-    height: 330px;
-}
-
-.bingo-cell {
-    border: 1px solid #e91e63;
-    padding: 6px 4px;
-    text-align: center;
-    font-size: 0.7rem;
-    font-weight: 500;
-    color: #333;
-    height: 66px;
+    border-radius: 15px;
+    padding: 25px 20px;
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #d81b60;
+    margin-bottom: 15px;
+    min-height: 80px;
     display: flex;
     align-items: center;
     justify-content: center;
-    position: relative;
-    transition: background-color 0.3s ease;
+    text-align: center;
+    animation: pulse 2s infinite;
     word-wrap: break-word;
-    hyphens: auto;
-    overflow: hidden;
     line-height: 1.2;
 }
 
-/* Padrão xadrez personalizado: linhas ímpares começam com rosa, pares com vermelho */
-
-/* Primeira linha (1-5): rosa, vermelho, rosa, vermelho, rosa */
-.bingo-cell:nth-child(1), .bingo-cell:nth-child(3), .bingo-cell:nth-child(5) {
-    background: #fce4ec; /* Rosa claro */
-    color: #333;
-    font-weight: 500;
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
 }
 
-.bingo-cell:nth-child(2), .bingo-cell:nth-child(4) {
-    background: #e91e63; /* Vermelho/Pink */
-    color: white;
-    font-weight: bold;
-}
-
-/* Segunda linha (6-10): vermelho, rosa, vermelho, rosa, vermelho */
-.bingo-cell:nth-child(6), .bingo-cell:nth-child(8), .bingo-cell:nth-child(10) {
-    background: #e91e63; /* Vermelho/Pink */
-    color: white;
-    font-weight: bold;
-}
-
-.bingo-cell:nth-child(7), .bingo-cell:nth-child(9) {
-    background: #fce4ec; /* Rosa claro */
-    color: #333;
-    font-weight: 500;
-}
-
-/* Terceira linha (11-15): rosa, vermelho, rosa (centro), vermelho, rosa */
-.bingo-cell:nth-child(11), .bingo-cell:nth-child(13), .bingo-cell:nth-child(15) {
-    background: #fce4ec; /* Rosa claro */
-    color: #333;
-    font-weight: 500;
-}
-
-.bingo-cell:nth-child(12), .bingo-cell:nth-child(14) {
-    background: #e91e63; /* Vermelho/Pink */
-    color: white;
-    font-weight: bold;
-}
-
-/* Quarta linha (16-20): vermelho, rosa, vermelho, rosa, vermelho */
-.bingo-cell:nth-child(16), .bingo-cell:nth-child(18), .bingo-cell:nth-child(20) {
-    background: #e91e63; /* Vermelho/Pink */
-    color: white;
-    font-weight: bold;
-}
-
-.bingo-cell:nth-child(17), .bingo-cell:nth-child(19) {
-    background: #fce4ec; /* Rosa claro */
-    color: #333;
-    font-weight: 500;
-}
-
-/* Quinta linha (21-25): rosa, vermelho, rosa, vermelho, rosa */
-.bingo-cell:nth-child(21), .bingo-cell:nth-child(23), .bingo-cell:nth-child(25) {
-    background: #fce4ec; /* Rosa claro */
-    color: #333;
-    font-weight: 500;
-}
-
-.bingo-cell:nth-child(22), .bingo-cell:nth-child(24) {
-    background: #e91e63; /* Vermelho/Pink */
-    color: white;
-    font-weight: bold;
-}
-
-.bingo-cell:nth-child(13) {
-    background: #fce4ec; /* Rosa claro - mantém o padrão da linha ímpar */
-    color: #e91e63;
-    font-weight: bold;
+.contador {
     font-size: 1rem;
+    color: #666;
+    font-weight: 500;
 }
 
-.bingo-cell:hover:not(.free-space) {
-    transform: scale(1.05);
-    box-shadow: 0 2px 8px rgba(233, 30, 99, 0.3);
+/* Progresso */
+.progresso-container {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
-/* Numeração da cartela */
-.cartela-numero {
-    position: absolute;
-    top: 10px;
-    right: 15px;
+.progresso-label {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #d81b60;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.progresso-bar {
+    background: #f0f0f0;
+    border-radius: 10px;
+    height: 12px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.progresso-fill {
+    background: linear-gradient(45deg, #e91e63, #f06292);
+    height: 100%;
+    width: 0%;
+    border-radius: 10px;
+    transition: width 0.5s ease;
+}
+
+.progresso-texto {
+    text-align: center;
+    font-size: 0.9rem;
+    color: #666;
+    font-weight: 500;
+}
+
+/* Lista de Sorteados */
+.itens-sorteados-container {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.header-sorteados {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.header-sorteados h3 {
+    color: #d81b60;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.badge-contador {
+    background: linear-gradient(45deg, #e91e63, #f06292);
+    color: white;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.lista-conferencia {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 2px solid #fce4ec;
+    border-radius: 10px;
+    padding: 15px;
+}
+
+.lista-vazia {
+    text-align: center;
+    color: #999;
+    font-style: italic;
+    padding: 20px;
+}
+
+.item-sorteado {
+    background: linear-gradient(135deg, #fce4ec, #f8bbd9);
+    border: 1px solid #e91e63;
+    border-radius: 8px;
+    padding: 10px 15px;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #d81b60;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    animation: slideInLeft 0.3s ease;
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.item-numero {
     background: #e91e63;
     color: white;
-    padding: 5px 10px;
-    border-radius: 15px;
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-size: 0.8rem;
-    font-weight: bold;
+    font-weight: 600;
+    flex-shrink: 0;
 }
 
-/* Estilos para impressão - 1 cartela por página */
-@media print {
-    @page {
-        size: A4;
-        margin: 5mm;
-        /* Remove cabeçalhos e rodapés da impressão */
-        @top-left { content: ""; }
-        @top-right { content: ""; }
-        @top-center { content: ""; }
-        @bottom-left { content: ""; }
-        @bottom-right { content: ""; }
-        @bottom-center { content: ""; }
-    }
-    
+/* Footer */
+footer {
+    text-align: center;
+    padding: 20px;
+    color: #666;
+    font-style: italic;
+}
+
+/* Responsividade para tablets */
+@media (min-width: 768px) {
     body {
-        background: white;
-        padding: 0;
-        margin: 0;
-    }
-    
-    header, .controls, .mensagem {
-        display: none !important;
-    }
-    
-    .cartelas-grid {
-        display: block;
-        padding: 0;
-        margin: 0;
-    }
-    
-    .cartela {
-        width: 190mm;
-        height: 250mm;
-        padding: 15mm;
-        margin: 0;
-        background: #fef7f7 !important; /* Rosa bem clarinho */
-        border: 3px solid #e91e63;
-        border-radius: 10mm;
-        box-shadow: none;
-        page-break-after: always;
-        page-break-inside: avoid;
-        transform: none;
-        position: relative;
-    }
-    
-    .cartela:last-child {
-        page-break-after: auto;
-    }
-    
-    .cartela-numero {
-        display: none !important;
-    }
-    
-    .cartela-header {
-        height: 25mm;
-        margin-bottom: 8mm;
-    }
-    
-    .cartela-titulo {
-        font-size: 5mm;
-    }
-    
-    .cartela-subtitulo {
-        font-size: 8mm;
-    }
-    
-    .bingo-grid {
-        height: 180mm;
-        gap: 1mm;
-        border: 2mm solid #e91e63;
-        display: grid;
-        grid-template-columns: repeat(5, 1fr);
-        grid-template-rows: repeat(5, 1fr);
-    }
-    
-    .bingo-cell {
-        font-size: 3.5mm;
-        border: 1mm solid #e91e63;
-        padding: 2mm;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        line-height: 1.2;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-    }
-    
-    /* Manter padrão xadrez personalizado na impressão */
-    /* Primeira linha: rosa, vermelho, rosa, vermelho, rosa */
-    .bingo-cell:nth-child(1), .bingo-cell:nth-child(3), .bingo-cell:nth-child(5) {
-        background: #fce4ec !important;
-        color: #333 !important;
-    }
-    .bingo-cell:nth-child(2), .bingo-cell:nth-child(4) {
-        background: #e91e63 !important;
-        color: white !important;
-    }
-    
-    /* Segunda linha: vermelho, rosa, vermelho, rosa, vermelho */
-    .bingo-cell:nth-child(6), .bingo-cell:nth-child(8), .bingo-cell:nth-child(10) {
-        background: #e91e63 !important;
-        color: white !important;
-    }
-    .bingo-cell:nth-child(7), .bingo-cell:nth-child(9) {
-        background: #fce4ec !important;
-        color: #333 !important;
-    }
-    
-    /* Terceira linha: rosa, vermelho, rosa (centro), vermelho, rosa */
-    .bingo-cell:nth-child(11), .bingo-cell:nth-child(13), .bingo-cell:nth-child(15) {
-        background: #fce4ec !important;
-        color: #333 !important;
-    }
-    .bingo-cell:nth-child(12), .bingo-cell:nth-child(14) {
-        background: #e91e63 !important;
-        color: white !important;
-    }
-    
-    /* Quarta linha: vermelho, rosa, vermelho, rosa, vermelho */
-    .bingo-cell:nth-child(16), .bingo-cell:nth-child(18), .bingo-cell:nth-child(20) {
-        background: #e91e63 !important;
-        color: white !important;
-    }
-    .bingo-cell:nth-child(17), .bingo-cell:nth-child(19) {
-        background: #fce4ec !important;
-        color: #333 !important;
-    }
-    
-    /* Quinta linha: rosa, vermelho, rosa, vermelho, rosa */
-    .bingo-cell:nth-child(21), .bingo-cell:nth-child(23), .bingo-cell:nth-child(25) {
-        background: #fce4ec !important;
-        color: #333 !important;
-    }
-    .bingo-cell:nth-child(22), .bingo-cell:nth-child(24) {
-        background: #e91e63 !important;
-        color: white !important;
-    }
-    
-    /* Centro especial */
-    .bingo-cell:nth-child(13) {
-        background: #fce4ec !important;
-        color: #e91e63 !important;
-        font-size: 4mm;
-    }
-}
-
-/* Responsividade */
-@media (max-width: 768px) {
-    header h1 {
-        font-size: 2rem;
-    }
-    
-    header h2 {
-        font-size: 1.4rem;
-    }
-    
-    .cartelas-grid {
-        grid-template-columns: 1fr;
-        gap: 20px;
-        padding: 10px;
+        padding: 20px;
+        max-width: 600px;
+        margin: 0 auto;
     }
     
     .controls {
-        flex-direction: column;
-        align-items: center;
+        flex-direction: row;
+        flex-wrap: wrap;
     }
     
-    .cartela {
-        width: 100%;
-        max-width: 380px;
-        height: 430px;
-        padding: 20px;
+    .btn-primary, .btn-secondary, .btn-tertiary {
+        flex: 1;
+        min-width: 150px;
     }
     
-    .bingo-grid {
-        height: 280px;
+    header h1 {
+        font-size: 3rem;
     }
     
-    .bingo-cell {
-        font-size: 0.65rem;
-        height: 56px;
-        padding: 4px 3px;
-    }
-    
-    /* Manter padrão xadrez personalizado no mobile */
-    /* Primeira linha: rosa, vermelho, rosa, vermelho, rosa */
-    .bingo-cell:nth-child(1), .bingo-cell:nth-child(3), .bingo-cell:nth-child(5) {
-        background: #fce4ec;
-        color: #333;
-    }
-    .bingo-cell:nth-child(2), .bingo-cell:nth-child(4) {
-        background: #e91e63;
-        color: white;
-    }
-    
-    /* Segunda linha: vermelho, rosa, vermelho, rosa, vermelho */
-    .bingo-cell:nth-child(6), .bingo-cell:nth-child(8), .bingo-cell:nth-child(10) {
-        background: #e91e63;
-        color: white;
-    }
-    .bingo-cell:nth-child(7), .bingo-cell:nth-child(9) {
-        background: #fce4ec;
-        color: #333;
-    }
-    
-    /* Terceira linha: rosa, vermelho, rosa (centro), vermelho, rosa */
-    .bingo-cell:nth-child(11), .bingo-cell:nth-child(13), .bingo-cell:nth-child(15) {
-        background: #fce4ec;
-        color: #333;
-    }
-    .bingo-cell:nth-child(12), .bingo-cell:nth-child(14) {
-        background: #e91e63;
-        color: white;
-    }
-    
-    /* Quarta linha: vermelho, rosa, vermelho, rosa, vermelho */
-    .bingo-cell:nth-child(16), .bingo-cell:nth-child(18), .bingo-cell:nth-child(20) {
-        background: #e91e63;
-        color: white;
-    }
-    .bingo-cell:nth-child(17), .bingo-cell:nth-child(19) {
-        background: #fce4ec;
-        color: #333;
-    }
-    
-    /* Quinta linha: rosa, vermelho, rosa, vermelho, rosa */
-    .bingo-cell:nth-child(21), .bingo-cell:nth-child(23), .bingo-cell:nth-child(25) {
-        background: #fce4ec;
-        color: #333;
-    }
-    .bingo-cell:nth-child(22), .bingo-cell:nth-child(24) {
-        background: #e91e63;
-        color: white;
-    }
-    
-    /* Centro especial */
-    .bingo-cell:nth-child(13) {
-        background: #fce4ec;
-        color: #e91e63;
-    }
-    
-    .cartela-header {
-        height: 70px;
+    .item-display {
+        font-size: 2.2rem;
+        padding: 30px;
     }
 }
 
-/* Para telas muito pequenas */
-@media (max-width: 480px) {
-    body {
-        padding: 10px;
-    }
-    
-    .cartela {
-        width: 100%;
-        max-width: 340px;
-        height: 400px;
-        padding: 15px;
-    }
-    
-    .bingo-grid {
-        height: 260px;
-    }
-    
-    .bingo-cell {
-        font-size: 0.6rem;
-        height: 52px;
-        padding: 3px 2px;
-    }
-    
-    /* Manter padrão xadrez personalizado em telas pequenas */
-    /* Primeira linha: rosa, vermelho, rosa, vermelho, rosa */
-    .bingo-cell:nth-child(1), .bingo-cell:nth-child(3), .bingo-cell:nth-child(5) {
-        background: #fce4ec;
-        color: #333;
-    }
-    .bingo-cell:nth-child(2), .bingo-cell:nth-child(4) {
-        background: #e91e63;
-        color: white;
-    }
-    
-    /* Segunda linha: vermelho, rosa, vermelho, rosa, vermelho */
-    .bingo-cell:nth-child(6), .bingo-cell:nth-child(8), .bingo-cell:nth-child(10) {
-        background: #e91e63;
-        color: white;
-    }
-    .bingo-cell:nth-child(7), .bingo-cell:nth-child(9) {
-        background: #fce4ec;
-        color: #333;
-    }
-    
-    /* Terceira linha: rosa, vermelho, rosa (centro), vermelho, rosa */
-    .bingo-cell:nth-child(11), .bingo-cell:nth-child(13), .bingo-cell:nth-child(15) {
-        background: #fce4ec;
-        color: #333;
-    }
-    .bingo-cell:nth-child(12), .bingo-cell:nth-child(14) {
-        background: #e91e63;
-        color: white;
-    }
-    
-    /* Quarta linha: vermelho, rosa, vermelho, rosa, vermelho */
-    .bingo-cell:nth-child(16), .bingo-cell:nth-child(18), .bingo-cell:nth-child(20) {
-        background: #e91e63;
-        color: white;
-    }
-    .bingo-cell:nth-child(17), .bingo-cell:nth-child(19) {
-        background: #fce4ec;
-        color: #333;
-    }
-    
-    /* Quinta linha: rosa, vermelho, rosa, vermelho, rosa */
-    .bingo-cell:nth-child(21), .bingo-cell:nth-child(23), .bingo-cell:nth-child(25) {
-        background: #fce4ec;
-        color: #333;
-    }
-    .bingo-cell:nth-child(22), .bingo-cell:nth-child(24) {
-        background: #e91e63;
-        color: white;
-    }
-    
-    /* Centro especial */
-    .bingo-cell:nth-child(13) {
-        background: #fce4ec;
-        color: #e91e63;
-    }
-    
-    .cartela-titulo {
-        font-size: 1rem;
-    }
-    
-    .cartela-subtitulo {
-        font-size: 1.2rem;
-    }
-    
-    .cartela-header {
-        height: 65px;
-    }
+/* Animações adicionais */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.item-sorteado-container, .itens-sorteados-container, .progresso-container {
+    animation: fadeIn 0.5s ease;
+}
+
+/* Scrollbar customizada */
+.lista-conferencia::-webkit-scrollbar {
+    width: 6px;
+}
+
+.lista-conferencia::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.lista-conferencia::-webkit-scrollbar-thumb {
+    background: #e91e63;
+    border-radius: 10px;
+}
+
+.lista-conferencia::-webkit-scrollbar-thumb:hover {
+    background: #d81b60;
 }
