@@ -319,22 +319,29 @@ header h2 {
     @page {
         size: A4;
         margin: 8mm;
-        /* Remove cabeçalhos e rodapés da impressão */
-        @top-left { content: ""; }
-        @top-right { content: ""; }
-        @top-center { content: ""; }
-        @bottom-left { content: ""; }
-        @bottom-right { content: ""; }
-        @bottom-center { content: ""; }
+    }
+    
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
     }
     
     body {
-        background: white;
-        padding: 0;
-        margin: 0;
+        background: white !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        font-family: 'Dancing Script', cursive !important;
     }
     
-    header, .controls, .mensagem {
+    /* Esconder tudo que não seja cartela */
+    header, 
+    .controls, 
+    .mensagem,
+    nav,
+    footer,
+    .cartela-numero,
+    .sorteio-link,
+    .mensagem-toast {
         display: none !important;
     }
     
@@ -343,74 +350,87 @@ header h2 {
         grid-template-columns: repeat(2, 1fr);
         grid-template-rows: repeat(2, 1fr);
         gap: 4mm;
-        padding: 0;
-        margin: 0;
-        width: 100%;
-        height: 100vh;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+        height: 100vh !important;
         box-sizing: border-box;
     }
     
     .cartela {
-        width: 88mm !important; /* Metade da largura A4 menos margens */
-        height: 120mm !important; /* Altura reduzida para caber 2 linhas */
-        padding: 6mm;
-        margin: 0;
-        background: #fef7f7 !important; /* Rosa bem clarinho */
-        border: 1.5mm solid #e91e63;
-        border-radius: 4mm;
-        box-shadow: none;
-        page-break-inside: avoid;
-        transform: none;
-        position: relative;
-        box-sizing: border-box;
+        width: 90mm !important; /* Otimizado para A4: 210mm - 16mm margin - 6mm gap = ~94mm / 2 = ~90mm */
+        height: 128mm !important; /* Otimizado para A4: 297mm - 16mm margin - 6mm gap = ~138mm / 2 = ~128mm */
+        padding: 3mm !important;
+        margin: 0 !important;
+        background: #fef7f7 !important;
+        border: 1mm solid #e91e63 !important;
+        border-radius: 3mm !important;
+        box-shadow: none !important;
+        page-break-inside: avoid !important;
+        transform: none !important;
+        position: relative !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important;
     }
     
     /* Quebrar página a cada 4 cartelas */
     .cartela:nth-child(4n) {
-        page-break-after: always;
+        page-break-after: always !important;
     }
     
     .cartela:last-child {
-        page-break-after: auto;
-    }
-    
-    .cartela-numero {
-        display: none !important;
+        page-break-after: auto !important;
     }
     
     .cartela-header {
-        height: 15mm;
-        margin-bottom: 4mm;
+        height: 12mm !important;
+        margin-bottom: 2mm !important;
+    }
+    
+    .cartela-decoracao {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 2mm !important;
     }
     
     .cartela-titulo {
-        font-size: 3.5mm;
+        font-size: 3mm !important;
+        font-weight: 700 !important;
+        text-align: center !important;
     }
     
     .cartela-subtitulo {
-        font-size: 5mm;
+        font-size: 4mm !important;
+        font-weight: 900 !important;
+        text-align: center !important;
+    }
+    
+    .estrela, .coracao {
+        font-size: 3mm !important;
     }
     
     .bingo-grid {
-        height: 85mm;
-        gap: 0.5mm;
-        border: 1mm solid #e91e63;
-        display: grid;
-        grid-template-columns: repeat(5, 1fr);
-        grid-template-rows: repeat(5, 1fr);
+        height: 100mm !important;
+        gap: 0.3mm !important;
+        border: 0.8mm solid #e91e63 !important;
+        display: grid !important;
+        grid-template-columns: repeat(5, 1fr) !important;
+        grid-template-rows: repeat(5, 1fr) !important;
     }
     
     .bingo-cell {
-        font-size: 2.2mm;
-        border: 0.5mm solid #e91e63;
-        padding: 1mm;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        line-height: 1.1;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
+        font-size: 1.8mm !important;
+        border: 0.3mm solid #e91e63 !important;
+        padding: 0.5mm !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        text-align: center !important;
+        line-height: 1.0 !important;
+        font-weight: 500 !important;
+        word-wrap: break-word !important;
+        overflow: hidden !important;
     }
     
     /* Manter padrão xadrez personalizado na impressão */
@@ -468,7 +488,8 @@ header h2 {
     .bingo-cell:nth-child(13) {
         background: #fce4ec !important;
         color: #e91e63 !important;
-        font-size: 2.8mm;
+        font-size: 2.2mm !important;
+        font-weight: 900 !important;
     }
 }
 
