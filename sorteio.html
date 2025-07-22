@@ -591,31 +591,49 @@ let scannerInterval = null;
         async function iniciarScanner() {
             try {
                 console.log('📷 Iniciando scanner...');
-                
+                // Solicita alta resolução e câmera traseira
                 stream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: 'environment' }
+                    video: {
+                        facingMode: { ideal: 'environment' },
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    }
                 });
-                
+
                 const video = document.getElementById('scanner-video');
                 if (video) {
                     video.srcObject = stream;
                     video.style.display = 'block';
+                    video.setAttribute('playsinline', 'true'); // iOS Safari
+                    video.setAttribute('autoplay', 'true');
+                    video.setAttribute('muted', 'true');
+                    // Ajusta tamanho responsivo
+                    video.style.width = '100%';
+                    video.style.maxWidth = '400px';
+                    video.style.height = 'auto';
                 }
-                
+
+                // Orientação para o usuário
+                const resultadoDiv = document.getElementById('resultadoValidacao');
+                if (resultadoDiv) {
+                    resultadoDiv.style.display = 'block';
+                    resultadoDiv.className = 'resultado-validacao';
+                    resultadoDiv.innerHTML = 'Aponte a câmera para o QR Code da cartela. Dê permissão para a câmera e mantenha o QR centralizado e focado.';
+                }
+
                 const iniciarBtn = document.getElementById('iniciarScanner');
                 const pararBtn = document.getElementById('pararScanner');
-                
+
                 if (iniciarBtn) iniciarBtn.style.display = 'none';
                 if (pararBtn) pararBtn.style.display = 'inline-block';
-                
+
                 scanning = true;
                 detectarQRCode(video);
-                
+
                 console.log('✅ Scanner iniciado com sucesso');
-                
             } catch (error) {
                 console.error('❌ Erro ao iniciar scanner:', error);
-                alert('Erro ao acessar a câmera: ' + error.message);
+                alert('Erro ao acessar a câmera: ' + error.message + '\nVerifique se o navegador tem permissão para usar a câmera.');
             }
         }
 
@@ -650,21 +668,22 @@ let scannerInterval = null;
                 return;
             }
             
+            // Canvas para capturar o frame do vídeo
             const canvas = document.createElement('canvas');
             const context = canvas.getContext('2d');
 
             scannerInterval = setInterval(() => {
-                if (!scanning || !video || video.videoWidth === 0) return;
+                if (!scanning || !video || video.readyState !== video.HAVE_ENOUGH_DATA) return;
 
+                // Ajusta o canvas para o tamanho do vídeo
                 canvas.width = video.videoWidth;
                 canvas.height = video.videoHeight;
                 context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
                 const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-                
+
                 if (typeof jsQR !== 'undefined') {
                     const qrCode = jsQR(imageData.data, canvas.width, canvas.height);
-
                     if (qrCode) {
                         console.log('📱 QR Code detectado:', qrCode.data);
                         pararScanner();
@@ -673,7 +692,7 @@ let scannerInterval = null;
                 } else {
                     console.error('❌ Biblioteca jsQR não carregada');
                 }
-            }, 250); // Reduzido para 250ms para melhor performance
+            }, 200); // 200ms para melhor responsividade
         }
 
         function validarCartela(dadosQR) {
