@@ -4,13 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sorteio e Validação - Bingo da Mari</title>
-    
-    <!-- Bibliotecas de QR Code para geração -->
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js" onload="console.log('QRCode v1 carregado')"></script>
-    <script src="https://unpkg.com/qrcode@1.5.3/build/qrcode.js" onload="console.log('QRCode v2 carregado')"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js" onload="console.log('QRious carregado')"></script>
-    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js" onload="console.log('QRCodeJS carregado')"></script>
-    
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
     <style>
         * {
             margin: 0;
@@ -50,159 +44,139 @@
             padding: 30px;
         }
 
-        .section {
-            margin-bottom: 40px;
-        }
-
-        .section h2 {
-            color: #e91e63;
-            margin-bottom: 20px;
-            font-size: 1.5rem;
-        }
-
-        .sorteio-area {
-            text-align: center;
-            background: linear-gradient(135deg, #fce4ec, #f8bbd9);
-            padding: 30px;
-            border-radius: 15px;
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
             margin-bottom: 30px;
         }
 
-        .item-sorteado {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #e91e63;
-            background: white;
+        .stat-card {
+            background: linear-gradient(135deg, #ff4081, #e91e63);
+            color: white;
             padding: 20px;
             border-radius: 15px;
-            margin: 20px 0;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            min-height: 100px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(233, 30, 99, 0.3);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .controls {
             display: flex;
-            align-items: center;
-            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
         }
 
         .btn {
-            background: linear-gradient(135deg, #e91e63, #f06292);
+            background: linear-gradient(135deg, #4caf50, #66bb6a);
             color: white;
             border: none;
             padding: 15px 30px;
             border-radius: 25px;
-            font-size: 1.1rem;
             cursor: pointer;
-            margin: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
             transition: all 0.3s ease;
         }
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(233, 30, 99, 0.3);
+            box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4);
         }
 
         .btn:disabled {
-            opacity: 0.5;
+            background: #ccc;
             cursor: not-allowed;
             transform: none;
+            box-shadow: none;
         }
 
-        .itens-sorteados {
-            background: #f5f5f5;
+        .btn.secondary {
+            background: linear-gradient(135deg, #ff9800, #ffb74d);
+        }
+
+        .item-sorteado {
+            background: linear-gradient(135deg, #9c27b0, #ba68c8);
+            color: white;
+            padding: 25px;
             border-radius: 15px;
-            padding: 20px;
-            max-height: 300px;
-            overflow-y: auto;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(156, 39, 176, 0.3);
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .lista-itens {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 10px;
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
         }
 
         .item {
-            background: white;
+            background: #f8f9fa;
             padding: 10px;
             border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border: 2px solid #e0e0e0;
             text-align: center;
+            font-weight: bold;
+            transition: all 0.3s ease;
         }
 
         .item.sorteado {
-            background: linear-gradient(135deg, #e91e63, #f06292);
+            background: linear-gradient(135deg, #4caf50, #66bb6a);
             color: white;
+            border-color: #4caf50;
+            transform: scale(1.02);
         }
 
-        .validacao-area {
-            background: linear-gradient(135deg, #e8f5e8, #c8e6c9);
-            border-radius: 15px;
-            padding: 30px;
-            text-align: center;
-        }
-
-        .qr-scanner {
-            background: white;
-            border: 3px dashed #4caf50;
-            border-radius: 15px;
-            padding: 40px 20px;
-            margin: 20px 0;
-        }
-
-        #scanner-video {
-            width: 100%;
-            max-width: 400px;
-            border: 2px solid #007bff;
-            border-radius: 10px;
-            margin: 10px 0;
-            background: #f8f9fa;
+        .scanner-section {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #f0f0f0;
         }
 
         .scanner-controls {
             display: flex;
             gap: 10px;
-            align-items: center;
+            margin-bottom: 20px;
             flex-wrap: wrap;
         }
 
-        .scanner-feedback {
-            margin-top: 10px;
-            padding: 10px;
-            border-radius: 5px;
-            font-weight: bold;
-            text-align: center;
-        }
-
-        /* Responsividade mobile para scanner */
-        @media (max-width: 768px) {
-            .scanner-controls {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .scanner-controls button {
-                margin: 5px 0;
-                padding: 12px 20px;
-                font-size: 1.1rem;
-            }
-
-            #scanner-video {
-                max-width: 100%;
-                height: auto;
-                aspect-ratio: 4/3;
-            }
-
-            .scanner-feedback {
-                font-size: 1rem;
-                padding: 15px;
-            }
+        #scanner-video {
+            width: 100%;
+            max-width: 400px;
+            border: 3px solid #e91e63;
+            border-radius: 15px;
+            display: none;
         }
 
         .resultado-validacao {
             margin-top: 20px;
             padding: 20px;
             border-radius: 15px;
+            text-align: center;
             font-weight: bold;
-            font-size: 1.2rem;
+            display: none;
         }
 
         .resultado-validacao.vencedor {
@@ -216,67 +190,25 @@
         }
 
         .cartela-info {
-            background: #f0f0f0;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 10px 0;
-            text-align: left;
-        }
-
-        .progress-container {
-            background: #e0e0e0;
-            border-radius: 10px;
-            padding: 5px;
-            margin: 20px 0;
-        }
-
-        .progress-bar {
-            background: linear-gradient(135deg, #e91e63, #f06292);
-            height: 20px;
-            border-radius: 8px;
-            transition: width 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 0.9rem;
-        }
-
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 20px;
-            margin: 20px 0;
-        }
-
-        .stat-card {
-            background: white;
+            margin-top: 20px;
             padding: 20px;
+            background: #f8f9fa;
             border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            text-align: center;
-        }
-
-        .stat-number {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #e91e63;
-        }
-
-        .stat-label {
-            color: #666;
-            margin-top: 5px;
+            border: 2px solid #e0e0e0;
+            display: none;
         }
 
         @media (max-width: 768px) {
-            .content {
-                padding: 20px;
+            .controls {
+                flex-direction: column;
             }
             
-            .item-sorteado {
-                font-size: 2rem;
-                padding: 15px;
+            .btn {
+                width: 100%;
+            }
+            
+            .stats {
+                grid-template-columns: 1fr;
             }
             
             .lista-itens {
@@ -288,1379 +220,510 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>� Sorteio e Validação</h1>
+            <h1>🎲 Sorteio e Validação</h1>
             <p>Chá de Panela da Mari - Sistema de Bingo</p>
         </div>
 
         <div class="content">
-            <!-- Seção de Sorteio -->
-            <div class="section">
-                <h2>🎲 Sorteio de Itens</h2>
-                <div class="sorteio-area">
-                    <div class="stats">
-                        <div class="stat-card">
-                            <div class="stat-number" id="totalItens">65</div>
-                            <div class="stat-label">Total de Itens</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number" id="itensSorteados">0</div>
-                            <div class="stat-label">Já Sorteados</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number" id="itensRestantes">65</div>
-                            <div class="stat-label">Restantes</div>
-                        </div>
-                    </div>
-                    
-                    <div class="progress-container">
-                        <div class="progress-bar" id="progressBar" style="width: 0%;">0%</div>
-                    </div>
-                    
-                    <div class="item-sorteado" id="itemAtual">
-                        Clique em "Sortear Item" para começar
-                    </div>
-                    
-                    <button id="sortearItem" class="btn">🎲 Sortear Item</button>
-                    <button id="reiniciarSorteio" class="btn" style="background: linear-gradient(135deg, #ff9800, #ffb74d);">🔄 Reiniciar Sorteio</button>
+            <!-- Estatísticas -->
+            <div class="stats">
+                <div class="stat-card">
+                    <span class="stat-number" id="totalItens">0</span>
+                    <span class="stat-label">Total de Itens</span>
                 </div>
-
-                <div class="itens-sorteados">
-                    <h3>Itens já sorteados:</h3>
-                    <div class="lista-itens" id="listaItens">
-                        <!-- Itens serão adicionados aqui -->
-                    </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="itensSorteados">0</span>
+                    <span class="stat-label">Itens Sorteados</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="itensRestantes">0</span>
+                    <span class="stat-label">Itens Restantes</span>
                 </div>
             </div>
 
-            <!-- Seção de Validação -->
-            <div class="section">
-                <h2>✅ Validação de Cartelas</h2>
-                <div class="validacao-area">
-                    <p>Use a câmera do celular para ler o QR Code da cartela:</p>
-                    
-                    <div class="qr-scanner">
-                        <!-- Scanner de câmera em tempo real -->
-                        <div id="cameraContainer" style="display: none;">
-                            <video id="cameraVideo" style="width: 100%; max-width: 400px; border: 2px solid #e91e63; border-radius: 10px;"></video>
-                            <canvas id="qrCanvas" style="display: none;"></canvas>
-                        </div>
-                        
-                        <!-- Botão único de validação -->
-                        <div id="botoesScanner">
-                            <button onclick="validarCartelaComWebRTC()" class="btn" style="background: linear-gradient(135deg, #4caf50, #66bb6a); padding: 15px 30px; font-size: 16px; font-weight: bold; width: 100%; margin: 10px 0;">
-                                🎯 Validar Cartela
-                            </button>
-                            
-                            <!-- Botão de teste para debug -->
-                            <button onclick="gerarQRCodeTeste()" class="btn" style="background: linear-gradient(135deg, #ff9800, #ffb74d); padding: 10px 20px; font-size: 14px; width: 100%; margin: 5px 0;">
-                                🧪 Gerar QR de Teste
-                            </button>
-                            
-                            <!-- Botão para verificar bibliotecas -->
-                            <button onclick="verificarBibliotecas()" class="btn" style="background: linear-gradient(135deg, #9c27b0, #ba68c8); padding: 8px 16px; font-size: 12px; width: 100%; margin: 3px 0;">
-                                🔍 Verificar Bibliotecas
-                            </button>
-                        </div>
-                        
-                        <input type="file" id="qrInput" accept="image/*" style="display: none;">
-                        
-                        <div style="margin-top: 15px;">
-                            <p style="font-size: 0.9rem; color: #666;">Ou cole o texto do QR Code:</p>
-                            <textarea id="qrText" placeholder="Cole aqui o texto do QR Code..." style="width: 100%; height: 100px; margin-top: 10px; padding: 10px; border: 1px solid #ddd; border-radius: 8px;"></textarea>
-                            <button id="validarTexto" class="btn" style="background: linear-gradient(135deg, #4caf50, #66bb6a); margin-top: 10px;">✅ Validar Texto</button>
-                        </div>
-                    </div>
+            <!-- Controles -->
+            <div class="controls">
+                <button id="sortearItem" class="btn">🎲 Sortear Item</button>
+                <button id="reiniciarSorteio" class="btn secondary">🔄 Reiniciar Sorteio</button>
+            </div>
 
-                    <div id="resultadoValidacao" class="resultado-validacao" style="display: none;"></div>
-                    <div id="cartelaInfo" class="cartela-info" style="display: none;"></div>
+            <!-- Item sorteado -->
+            <div class="item-sorteado" id="itemSorteado">
+                Clique em "Sortear Item" para começar!
+            </div>
+
+            <!-- Lista de itens -->
+            <h3>📋 Lista de Itens</h3>
+            <div class="lista-itens" id="listaItens">
+                <!-- Itens serão carregados aqui -->
+            </div>
+
+            <!-- Scanner de QR Code -->
+            <div class="scanner-section">
+                <h3>📱 Validação de Cartela</h3>
+                <div class="scanner-controls">
+                    <button id="iniciarScanner" class="btn">📷 Iniciar Scanner</button>
+                    <button id="pararScanner" class="btn secondary" style="display: none;">⏹️ Parar Scanner</button>
                 </div>
+                
+                <video id="scanner-video" autoplay playsinline></video>
+                
+                <div class="resultado-validacao" id="resultadoValidacao"></div>
+                <div class="cartela-info" id="cartelaInfo"></div>
             </div>
         </div>
     </div>
 
-    <!-- Bibliotecas necessárias -->
-        <!-- Scripts necessários -->
-    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
-    <!-- QuaggaJS para melhor leitura de códigos -->
-    <script src="https://cdn.jsdelivr.net/npm/quagga@0.12.1/dist/quagga.min.js"></script>
-    <!-- Instascan como alternativa moderna -->
-    <script src="https://cdn.jsdelivr.net/npm/instascan@1.0.0/instascan.min.js"></script>
-    
     <script>
-        // Itens da cozinha (mesmo array do script principal)
-        const itensCozinha = [
+        console.log('🚀 Carregando sistema de sorteio...');
+        
+        // Array de itens do bingo (idêntico ao script-novo.js)
+        const itensBingo = [
+            // Talheres Básicos
             "Garfo", "Faca", "Colher", "Colher de chá", "Faca de pão", "Garfo de sobremesa",
+            
+            // Panelas e Frigideiras
             "Panela de pressão", "Panela", "Frigideira", "Caçarola", "Leiteira", "Chaleira",
+            
+            // Utensílios Básicos de Cozinha
             "Concha", "Escumadeira", "Espátula", "Colher de pau", "Batedor de ovos", "Pegador",
             "Abridor de latas", "Saca-rolhas", "Descascador", "Ralador", "Peneira", "Coador",
             "Tábua de corte", "Rolo de massa", "Funil",
+            
+            // Assadeiras e Formas
             "Assadeira", "Forma de bolo", "Forma de pizza", "Forma de pão", "Refratário",
+            
+            // Eletrodomésticos Comuns
             "Liquidificador", "Batedeira", "Torradeira", "Cafeteira", "Micro-ondas", "Mixer",
+            
+            // Recipientes e Potes
             "Tigela", "Jarra", "Potes", "Tupperware", "Garrafa térmica",
+            
+            // Itens para Servir
             "Pratos", "Xícaras", "Copos", "Canecas", "Travessa", "Açucareiro", "Bule",
+            
+            // Utensílios de Medição
             "Balança", "Xícaras medidoras", "Timer",
+            
+            // Itens Diversos
             "Avental", "Luvas de forno", "Panos de prato", "Escorredor de louças", "Porta-talheres",
             "Descanso de panela", "Guardanapos", "Papel toalha", "Papel alumínio", "Filme plástico"
         ];
 
+        // Estado do jogo
         let itensSorteados = [];
-        let itensRestantes = [...itensCozinha];
+        let itensDisponiveis = [...itensBingo];
 
-        // Inicializar interface
-        function inicializar() {
-            criarListaItens();
-            atualizarEstatisticas();
+        // Estado do scanner
+        let stream = null;
+        let scanning = false;
+        let scannerInterval = null;
+
+        // Aguardar carregamento da página
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', inicializarSistema);
+        } else {
+            inicializarSistema();
+        }
+
+        function inicializarSistema() {
+            console.log('🎲 Inicializando sistema de sorteio...');
+            
+            // Verificar se elementos existem
+            const sortearBtn = document.getElementById('sortearItem');
+            const reiniciarBtn = document.getElementById('reiniciarSorteio');
+            
+            if (!sortearBtn || !reiniciarBtn) {
+                console.error('❌ Elementos não encontrados!');
+                return;
+            }
+            
+            console.log('✅ Elementos encontrados, configurando...');
+            
+            inicializar();
             configurarEventListeners();
         }
 
-        // Criar lista visual de todos os itens
-        function criarListaItens() {
-            const listaItens = document.getElementById('listaItens');
-            listaItens.innerHTML = '';
-
-            itensCozinha.forEach(item => {
-                const divItem = document.createElement('div');
-                divItem.className = 'item';
-                divItem.textContent = item;
-                divItem.id = `item-${item.replace(/\s+/g, '-')}`;
-                listaItens.appendChild(divItem);
-            });
+        function inicializar() {
+            console.log('📊 Carregando dados iniciais...');
+            carregarItens();
+            atualizarEstatisticas();
+            carregarEstadoSorteio();
+            console.log('✅ Sistema inicializado com sucesso!');
         }
 
-        // Sortear próximo item
+        function configurarEventListeners() {
+            console.log('🔗 Configurando event listeners...');
+            
+            const sortearBtn = document.getElementById('sortearItem');
+            const reiniciarBtn = document.getElementById('reiniciarSorteio');
+            const iniciarScannerBtn = document.getElementById('iniciarScanner');
+            const pararScannerBtn = document.getElementById('pararScanner');
+            
+            if (sortearBtn) {
+                sortearBtn.addEventListener('click', function() {
+                    console.log('🎲 Botão sortear clicado!');
+                    sortearItem();
+                });
+                console.log('✅ Event listener do sortear configurado');
+            }
+            
+            if (reiniciarBtn) {
+                reiniciarBtn.addEventListener('click', function() {
+                    console.log('🔄 Botão reiniciar clicado!');
+                    reiniciarSorteio();
+                });
+                console.log('✅ Event listener do reiniciar configurado');
+            }
+            
+            if (iniciarScannerBtn) {
+                iniciarScannerBtn.addEventListener('click', function() {
+                    console.log('📷 Botão iniciar scanner clicado!');
+                    iniciarScanner();
+                });
+                console.log('✅ Event listener do scanner configurado');
+            }
+            
+            if (pararScannerBtn) {
+                pararScannerBtn.addEventListener('click', function() {
+                    console.log('⏹️ Botão parar scanner clicado!');
+                    pararScanner();
+                });
+                console.log('✅ Event listener do parar scanner configurado');
+            }
+            
+            console.log('🎯 Todos os event listeners configurados!');
+        }
+
+        function carregarItens() {
+            console.log('📋 Carregando lista de itens...');
+            const container = document.getElementById('listaItens');
+            
+            if (!container) {
+                console.error('❌ Container da lista não encontrado!');
+                return;
+            }
+            
+            container.innerHTML = '';
+
+            itensBingo.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'item';
+                div.textContent = item;
+                
+                if (itensSorteados.includes(item)) {
+                    div.classList.add('sorteado');
+                }
+                
+                container.appendChild(div);
+            });
+            
+            console.log(`✅ ${itensBingo.length} itens carregados na lista`);
+        }
+
+        function atualizarEstatisticas() {
+            console.log('📈 Atualizando estatísticas...');
+            
+            const totalElement = document.getElementById('totalItens');
+            const sorteadosElement = document.getElementById('itensSorteados');
+            const restantesElement = document.getElementById('itensRestantes');
+            
+            if (totalElement) totalElement.textContent = itensBingo.length;
+            if (sorteadosElement) sorteadosElement.textContent = itensSorteados.length;
+            if (restantesElement) restantesElement.textContent = itensDisponiveis.length;
+            
+            const btnSortear = document.getElementById('sortearItem');
+            if (btnSortear) {
+                btnSortear.disabled = itensDisponiveis.length === 0;
+                
+                if (itensDisponiveis.length === 0) {
+                    btnSortear.textContent = '🎉 Sorteio Completo!';
+                } else {
+                    btnSortear.textContent = '🎲 Sortear Item';
+                }
+            }
+            
+            console.log(`📊 Stats: ${itensSorteados.length}/${itensBingo.length} sorteados`);
+        }
+
         function sortearItem() {
-            if (itensRestantes.length === 0) {
-                alert('Todos os itens já foram sorteados!');
+            console.log('🎲 Executando sorteio...');
+            
+            if (itensDisponiveis.length === 0) {
+                alert('🎉 Todos os itens já foram sorteados!');
+                console.log('⚠️ Tentativa de sorteio com lista vazia');
                 return;
             }
 
-            const indiceAleatorio = Math.floor(Math.random() * itensRestantes.length);
-            const itemSorteado = itensRestantes[indiceAleatorio];
-            
-            // Remover da lista de restantes e adicionar aos sorteados
-            itensRestantes.splice(indiceAleatorio, 1);
-            itensSorteados.push(itemSorteado);
+            const indice = Math.floor(Math.random() * itensDisponiveis.length);
+            const item = itensDisponiveis[indice];
 
-            // Atualizar interface
-            document.getElementById('itemAtual').textContent = itemSorteado;
-            
-            // Marcar item na lista
-            const elementoItem = document.getElementById(`item-${itemSorteado.replace(/\s+/g, '-')}`);
-            if (elementoItem) {
-                elementoItem.classList.add('sorteado');
+            itensDisponiveis.splice(indice, 1);
+            itensSorteados.push(item);
+
+            const itemElement = document.getElementById('itemSorteado');
+            if (itemElement) {
+                itemElement.textContent = item;
             }
-
+            
+            carregarItens();
             atualizarEstatisticas();
             salvarEstadoSorteio();
 
-            // Efeito sonoro ou vibração (se disponível)
+            console.log(`🎯 Item sorteado: "${item}"`);
+            
+            // Feedback visual
             if ('vibrate' in navigator) {
-                navigator.vibrate(200);
+                navigator.vibrate(100);
             }
         }
 
-        // Reiniciar sorteio
         function reiniciarSorteio() {
-            if (confirm('Tem certeza que deseja reiniciar o sorteio? Todos os itens sorteados serão perdidos.')) {
+            console.log('🔄 Tentando reiniciar sorteio...');
+            
+            if (confirm('🔄 Tem certeza que deseja reiniciar o sorteio?')) {
                 itensSorteados = [];
-                itensRestantes = [...itensCozinha];
+                itensDisponiveis = [...itensBingo];
                 
-                document.getElementById('itemAtual').textContent = 'Clique em "Sortear Item" para começar';
+                const itemElement = document.getElementById('itemSorteado');
+                if (itemElement) {
+                    itemElement.textContent = 'Clique em "Sortear Item" para começar!';
+                }
                 
-                // Remover marcação de todos os itens
-                document.querySelectorAll('.item.sorteado').forEach(item => {
-                    item.classList.remove('sorteado');
-                });
-
+                carregarItens();
                 atualizarEstatisticas();
                 salvarEstadoSorteio();
+                
+                console.log('✅ Sorteio reiniciado com sucesso!');
+            } else {
+                console.log('❌ Reinício cancelado pelo usuário');
             }
         }
 
-        // Atualizar estatísticas
-        function atualizarEstatisticas() {
-            const totalItens = itensCozinha.length;
-            const sorteados = itensSorteados.length;
-            const restantes = itensRestantes.length;
-            const porcentagem = Math.round((sorteados / totalItens) * 100);
-
-            document.getElementById('totalItens').textContent = totalItens;
-            document.getElementById('itensSorteados').textContent = sorteados;
-            document.getElementById('itensRestantes').textContent = restantes;
-            
-            const progressBar = document.getElementById('progressBar');
-            progressBar.style.width = `${porcentagem}%`;
-            progressBar.textContent = `${porcentagem}%`;
-        }
-
-        // Salvar estado do sorteio no localStorage
         function salvarEstadoSorteio() {
-            const estado = {
-                itensSorteados,
-                itensRestantes,
-                timestamp: new Date().toISOString()
-            };
-            localStorage.setItem('estadoSorteio', JSON.stringify(estado));
+            try {
+                const estado = {
+                    itensSorteados: itensSorteados,
+                    timestamp: new Date().toISOString()
+                };
+                localStorage.setItem('bingoSorteio', JSON.stringify(estado));
+                console.log('💾 Estado do sorteio salvo');
+            } catch (error) {
+                console.error('❌ Erro ao salvar estado:', error);
+            }
         }
 
-        // Carregar estado do sorteio do localStorage
         function carregarEstadoSorteio() {
-            const estadoSalvo = localStorage.getItem('estadoSorteio');
-            if (estadoSalvo) {
-                try {
-                    const estado = JSON.parse(estadoSalvo);
-                    itensSorteados = estado.itensSorteados || [];
-                    itensRestantes = estado.itensRestantes || [...itensCozinha];
-                    
-                    // Marcar itens já sorteados na interface
-                    itensSorteados.forEach(item => {
-                        const elementoItem = document.getElementById(`item-${item.replace(/\s+/g, '-')}`);
-                        if (elementoItem) {
-                            elementoItem.classList.add('sorteado');
-                        }
-                    });
+            try {
+                const estado = localStorage.getItem('bingoSorteio');
+                if (estado) {
+                    const dados = JSON.parse(estado);
+                    itensSorteados = dados.itensSorteados || [];
+                    itensDisponiveis = itensBingo.filter(item => !itensSorteados.includes(item));
                     
                     if (itensSorteados.length > 0) {
-                        document.getElementById('itemAtual').textContent = `Último sorteado: ${itensSorteados[itensSorteados.length - 1]}`;
-                    }
-                    
-                    atualizarEstatisticas();
-                } catch (e) {
-                    console.error('Erro ao carregar estado do sorteio:', e);
-                }
-            }
-        }
-
-        // Função para gerar hash da cartela (compatível com script.js)
-        function gerarHashCartela(numero, itens) {
-            const dados = `${numero}-${itens.sort().join(',')}`;
-            let hash = 0;
-            for (let i = 0; i < dados.length; i++) {
-                const char = dados.charCodeAt(i);
-                hash = ((hash << 5) - hash) + char;
-                hash = hash & hash; // Converter para 32bit integer
-            }
-            return hash.toString();
-        }
-
-        // Validar cartela através do QR Code (Sistema atualizado com ID)
-        function validarCartela(dadosQR) {
-            try {
-                console.log('🔍 Dados recebidos para validação:', dadosQR);
-                
-                let cartelaId = dadosQR;
-                let dadosCartela = null;
-                
-                // VERIFICAR SE É UM ID SIMPLES (novo sistema)
-                if (typeof dadosQR === 'string' && dadosQR.match(/^MARI\d+/)) {
-                    console.log('� Detectado ID de cartela:', cartelaId);
-                    
-                    // CARREGAR BASE DE DADOS DO LOCALSTORAGE
-                    const database = JSON.parse(localStorage.getItem('cartelasDatabase') || '{}');
-                    console.log('📊 Base de dados carregada:', Object.keys(database).length, 'cartelas');
-                    
-                    // BUSCAR DADOS DA CARTELA
-                    dadosCartela = database[cartelaId];
-                    
-                    if (!dadosCartela) {
-                        throw new Error(`Cartela com ID "${cartelaId}" não encontrada na base de dados. Certifique-se de que as cartelas foram geradas nesta sessão.`);
-                    }
-                    
-                    console.log('✅ Cartela encontrada na base:', dadosCartela);
-                    
-                } else {
-                    // TENTAR SISTEMA ANTIGO (JSON)
-                    try {
-                        dadosCartela = JSON.parse(dadosQR);
-                        cartelaId = dadosCartela.hash || `Cartela-${dadosCartela.numero}`;
-                        console.log('📋 Dados da cartela (sistema antigo):', dadosCartela);
-                    } catch (parseError) {
-                        throw new Error('QR Code não é um ID válido nem contém dados JSON válidos');
-                    }
-                }
-
-                console.log('🔒 Analisando cartela...');
-                console.log('🎲 Itens sorteados até agora:', itensSorteados);
-                console.log('📋 Itens da cartela:', dadosCartela.itens);
-
-                // Verificar se é uma cartela vencedora
-                const itensCartela = dadosCartela.itens;
-                const itensCartelaSorteados = itensCartela.filter(item => itensSorteados.includes(item));
-                const itensNaoSorteados = itensCartela.filter(item => !itensSorteados.includes(item));
-                const isVencedor = itensNaoSorteados.length === 0;
-                
-                console.log('� Análise da cartela:', {
-                    totalItens: itensCartela.length,
-                    itensSorteados: itensCartelaSorteados.length,
-                    itensRestantes: itensNaoSorteados.length,
-                    vencedor: isVencedor
-                });
-
-                // Mostrar resultado
-                const resultadoDiv = document.getElementById('resultadoValidacao');
-                const cartelaInfoDiv = document.getElementById('cartelaInfo');
-                
-                if (resultadoDiv) resultadoDiv.style.display = 'block';
-                if (cartelaInfoDiv) cartelaInfoDiv.style.display = 'block';
-
-                if (isVencedor) {
-                    if (resultadoDiv) {
-                        resultadoDiv.className = 'resultado-validacao vencedor';
-                        resultadoDiv.innerHTML = '🎉 CARTELA VENCEDORA! 🎉<br>BINGO VÁLIDO!';
-                    }
-                    
-                    // Vibrar se disponível
-                    if ('vibrate' in navigator) {
-                        navigator.vibrate([200, 100, 200, 100, 200]);
-                    }
-                    
-                    // Som de vitória
-                    try {
-                        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                        const oscillator = audioContext.createOscillator();
-                        const gainNode = audioContext.createGain();
-                        
-                        oscillator.connect(gainNode);
-                        gainNode.connect(audioContext.destination);
-                        
-                        oscillator.frequency.value = 800;
-                        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-                        
-                        oscillator.start();
-                        oscillator.stop(audioContext.currentTime + 0.5);
-                    } catch (e) {}
-                    
-                } else {
-                    if (resultadoDiv) {
-                        resultadoDiv.className = 'resultado-validacao perdedor';
-                        resultadoDiv.innerHTML = `❌ Cartela ainda não vencedora<br>Faltam ${itensNaoSorteados.length} item(ns)`;
-                    }
-                }
-
-                // Mostrar informações detalhadas da cartela
-                if (cartelaInfoDiv) {
-                    const progressoCartela = Math.round((itensCartelaSorteados.length / itensCartela.length) * 100);
-                    
-                    cartelaInfoDiv.innerHTML = `
-                        <h4>📋 Cartela ${dadosCartela.numero} - Detalhes</h4>
-                        <p><strong>🆔 ID:</strong> ${cartelaId}</p>
-                        
-                        <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; margin: 10px 0;">
-                            <h5 style="margin: 0 0 10px 0; color: #4caf50;">✅ Itens já sorteados (${itensCartelaSorteados.length}/${itensCartela.length})</h5>
-                            <div style="font-size: 14px; color: #2e7d32;">
-                                ${itensCartelaSorteados.length > 0 ? itensCartelaSorteados.map(item => `<span style="background: #4caf50; color: white; padding: 2px 6px; border-radius: 3px; margin: 2px; display: inline-block;">${item}</span>`).join(' ') : '<em>Nenhum item sorteado ainda</em>'}
-                            </div>
-                        </div>
-                        
-                        ${itensNaoSorteados.length > 0 ? `
-                        <div style="background: #ffeaea; padding: 15px; border-radius: 8px; margin: 10px 0;">
-                            <h5 style="margin: 0 0 10px 0; color: #e91e63;">⏳ Itens ainda não sorteados (${itensNaoSorteados.length})</h5>
-                            <div style="font-size: 14px; color: #c62828;">
-                                ${itensNaoSorteados.map(item => `<span style="background: #e91e63; color: white; padding: 2px 6px; border-radius: 3px; margin: 2px; display: inline-block;">${item}</span>`).join(' ')}
-                            </div>
-                        </div>
-                        ` : ''}
-                        
-                        <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 10px 0;">
-                            <p><strong>📊 Progresso:</strong> ${progressoCartela}% completa</p>
-                            <p><strong>🎪 Evento:</strong> ${dadosCartela.evento || 'Chá de Panela da Mari'}</p>
-                            <p><strong>📅 Gerada em:</strong> ${dadosCartela.criadaEm ? new Date(dadosCartela.criadaEm).toLocaleString('pt-BR') : 'N/A'}</p>
-                            <p><strong>🎲 Total de itens sorteados no jogo:</strong> ${itensSorteados.length}</p>
-                        </div>
-                    `;
-                }
-
-                console.log('✅ Validação concluída com sucesso!');
-
-            } catch (error) {
-                console.error('❌ Erro na validação:', error);
-                
-                const resultadoDiv = document.getElementById('resultadoValidacao');
-                const cartelaInfoDiv = document.getElementById('cartelaInfo');
-                
-                if (resultadoDiv) {
-                    resultadoDiv.style.display = 'block';
-                    resultadoDiv.className = 'resultado-validacao perdedor';
-                    resultadoDiv.innerHTML = `❌ Erro na validação<br>${error.message}`;
-                }
-                
-                if (cartelaInfoDiv) {
-                    cartelaInfoDiv.style.display = 'block';
-                    cartelaInfoDiv.innerHTML = `
-                        <h4>⚠️ Erro na Validação</h4>
-                        <p style="color: #e91e63;">${error.message}</p>
-                        <p><strong>Dica:</strong> Certifique-se de que:</p>
-                        <ul>
-                            <li>As cartelas foram geradas na mesma sessão/navegador</li>
-                            <li>O QR Code é de uma cartela válida deste jogo</li>
-                            <li>O QR Code não está danificado</li>
-                        </ul>
-                        <p><strong>Dados recebidos:</strong></p>
-                        <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px; font-size: 12px; overflow-x: auto;">${dadosQR.substring(0, 200)}${dadosQR.length > 200 ? '...' : ''}</pre>
-                        
-                        <p><strong>Base de dados:</strong></p>
-                        <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px; font-size: 12px; overflow-x: auto;">${Object.keys(JSON.parse(localStorage.getItem('cartelasDatabase') || '{}')).join(', ') || 'Vazia'}</pre>
-                    `;
-                }
-            }
-        }
-                        const oscillator = audioContext.createOscillator();
-                        const gainNode = audioContext.createGain();
-                        
-                        oscillator.connect(gainNode);
-                        gainNode.connect(audioContext.destination);
-                        
-                        oscillator.frequency.value = 800;
-                        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-                        
-                        oscillator.start();
-                        oscillator.stop(audioContext.currentTime + 0.5);
-                    } catch (e) {}
-                    
-                } else {
-                    if (resultadoDiv) {
-                        resultadoDiv.className = 'resultado-validacao perdedor';
-                        resultadoDiv.innerHTML = `❌ Cartela ainda não vencedora<br>Faltam ${itensNaoSorteados.length} item(ns)`;
-                    }
-                }
-
-                // Mostrar informações detalhadas da cartela
-                if (cartelaInfoDiv) {
-                    const progressoCartela = Math.round((itensCartelaSorteados.length / itensCartela.length) * 100);
-                    
-                    cartelaInfoDiv.innerHTML = `
-                        <h4>📋 Cartela ${dadosCartela.numero} - Detalhes</h4>
-                        
-                        <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; margin: 10px 0;">
-                            <h5 style="margin: 0 0 10px 0; color: #4caf50;">✅ Itens já sorteados (${itensCartelaSorteados.length}/${itensCartela.length})</h5>
-                            <div style="font-size: 14px; color: #2e7d32;">
-                                ${itensCartelaSorteados.length > 0 ? itensCartelaSorteados.map(item => `<span style="background: #4caf50; color: white; padding: 2px 6px; border-radius: 3px; margin: 2px; display: inline-block;">${item}</span>`).join(' ') : '<em>Nenhum item sorteado ainda</em>'}
-                            </div>
-                        </div>
-                        
-                        ${itensNaoSorteados.length > 0 ? `
-                        <div style="background: #ffeaea; padding: 15px; border-radius: 8px; margin: 10px 0;">
-                            <h5 style="margin: 0 0 10px 0; color: #e91e63;">⏳ Itens ainda não sorteados (${itensNaoSorteados.length})</h5>
-                            <div style="font-size: 14px; color: #c62828;">
-                                ${itensNaoSorteados.map(item => `<span style="background: #e91e63; color: white; padding: 2px 6px; border-radius: 3px; margin: 2px; display: inline-block;">${item}</span>`).join(' ')}
-                            </div>
-                        </div>
-                        ` : ''}
-                        
-                        <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 10px 0;">
-                            <p><strong>📊 Progresso:</strong> ${progressoCartela}% completa</p>
-                            <p><strong>🎪 Evento:</strong> ${dadosCartela.evento || 'Chá de Panela da Mari'}</p>
-                            <p><strong>📅 Gerada em:</strong> ${dadosCartela.criadaEm ? new Date(dadosCartela.criadaEm).toLocaleString('pt-BR') : 'N/A'}</p>
-                            <p><strong>🎲 Total de itens sorteados no jogo:</strong> ${itensSorteados.length}</p>
-                        </div>
-                    `;
-                }
-
-                console.log('✅ Validação concluída com sucesso!');
-
-            } catch (error) {
-                console.error('❌ Erro na validação:', error);
-                
-                const resultadoDiv = document.getElementById('resultadoValidacao');
-                const cartelaInfoDiv = document.getElementById('cartelaInfo');
-                
-                if (resultadoDiv) {
-                    resultadoDiv.style.display = 'block';
-                    resultadoDiv.className = 'resultado-validacao perdedor';
-                    resultadoDiv.innerHTML = `❌ Erro na validação<br>${error.message}`;
-                }
-                
-                if (cartelaInfoDiv) {
-                    cartelaInfoDiv.style.display = 'block';
-                    cartelaInfoDiv.innerHTML = `
-                        <h4>⚠️ Erro na Validação</h4>
-                        <p style="color: #e91e63;">${error.message}</p>
-                        <p><strong>Dica:</strong> Certifique-se de que:</p>
-                        <ul>
-                            <li>As cartelas foram geradas na mesma sessão/navegador</li>
-                            <li>O QR Code é de uma cartela válida deste jogo</li>
-                            <li>O QR Code não está danificado</li>
-                        </ul>
-                        <p><strong>Dados recebidos:</strong></p>
-                        <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px; font-size: 12px; overflow-x: auto;">${dadosQR}</pre>
-                    `;
-                }
-            }
-        }
-
-        // Gerar hash simples para verificar integridade (mesma função do script principal)
-        function gerarHashCartelaLegacy(numero, itens) {
-            const dados = `${numero}-${itens.sort().join(',')}`;
-            let hash = 0;
-            for (let i = 0; i < dados.length; i++) {
-                const char = dados.charCodeAt(i);
-                hash = ((hash << 5) - hash) + char;
-                hash = hash & hash; // Converter para 32bit integer
-            }
-            return hash.toString();
-        }
-
-        // Variáveis globais para o scanner
-        let videoStream = null;
-        let scannerAtivo = false;
-        let scannerInterval = null;
-        let barcodeDetector = null;
-
-        // Debug: função para testar disponibilidade de tecnologias
-        function debugBotaoCamera() {
-            console.log('🔍 DEBUG: Testando tecnologias disponíveis...');
-            
-            const tecnologias = {
-                'Navigator.mediaDevices': !!navigator.mediaDevices,
-                'getUserMedia': !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia),
-                'BarcodeDetector': 'BarcodeDetector' in window,
-                'jsQR': typeof jsQR !== 'undefined',
-                'Instascan': typeof Instascan !== 'undefined',
-                'Quagga': typeof Quagga !== 'undefined'
-            };
-            
-            console.table(tecnologias);
-            
-            let mensagem = '🔍 Tecnologias: ';
-            Object.entries(tecnologias).forEach(([tech, available]) => {
-                mensagem += `${tech}: ${available ? '✅' : '❌'} `;
-            });
-            
-            mostrarFeedback(mensagem, 'info');
-        }
-
-        // Função principal melhorada que tenta múltiplas abordagens
-        async function testarCameraSimplesmente() {
-            console.log('� Iniciando detecção QR com múltiplas tecnologias...');
-            mostrarFeedback('� Escolhendo melhor método de scanner...', 'info');
-            
-            // 1. Tentar Instascan primeiro (melhor para QR)
-            if (typeof Instascan !== 'undefined') {
-                console.log('📸 Tentando Instascan (método preferido)...');
-                iniciarScannerInstascan();
-                return;
-            }
-            
-            // 2. Fallback para método tradicional
-            console.log('� Instascan não disponível, usando método tradicional...');
-            iniciarScannerTradicional();
-        }
-
-        // Função moderna usando Instascan (específica para QR)
-        async function iniciarScannerInstascan() {
-            console.log('� Tentando Instascan para QR Code...');
-            mostrarFeedback('� Iniciando scanner QR moderno...', 'info');
-            
-            try {
-                // Verificar se Instascan está disponível
-                if (typeof Instascan === 'undefined') {
-                    throw new Error('Instascan não carregado, usando método alternativo');
-                }
-                
-                const video = document.getElementById('cameraVideo');
-                const cameraContainer = document.getElementById('cameraContainer');
-                const botoesScanner = document.getElementById('botoesScanner');
-                
-                // Criar scanner Instascan
-                const scanner = new Instascan.Scanner({ 
-                    video: video,
-                    scanPeriod: 5, // Scan a cada 5ms para melhor responsividade
-                    mirror: false // Não espelhar para câmera traseira
-                });
-                
-                // Evento quando QR Code é detectado
-                scanner.addListener('scan', function (content) {
-                    console.log('🎯 QR detectado via Instascan:', content);
-                    
-                    // Parar scanner
-                    scanner.stop();
-                    cameraContainer.style.display = 'none';
-                    botoesScanner.style.display = 'block';
-                    
-                    // Processar QR Code
-                    document.getElementById('qrText').value = content;
-                    validarCartela(content);
-                    
-                    mostrarFeedback('✅ QR lido com Instascan!', 'success');
-                    
-                    // Vibração
-                    if ('vibrate' in navigator) {
-                        navigator.vibrate([200, 100, 200]);
-                    }
-                });
-                
-                // Obter câmeras disponíveis
-                const cameras = await Instascan.Camera.getCameras();
-                console.log('📷 Câmeras encontradas:', cameras.length);
-                
-                if (cameras.length > 0) {
-                    // Preferir câmera traseira (environment)
-                    let selectedCamera = cameras[0];
-                    
-                    for (const camera of cameras) {
-                        if (camera.name.toLowerCase().includes('back') || 
-                            camera.name.toLowerCase().includes('rear') ||
-                            camera.name.toLowerCase().includes('environment')) {
-                            selectedCamera = camera;
-                            break;
+                        const itemElement = document.getElementById('itemSorteado');
+                        if (itemElement) {
+                            itemElement.textContent = itensSorteados[itensSorteados.length - 1];
                         }
                     }
                     
-                    console.log('📱 Usando câmera:', selectedCamera.name);
-                    
-                    // Mostrar vídeo e iniciar scanner
-                    cameraContainer.style.display = 'block';
-                    botoesScanner.style.display = 'none';
-                    
-                    scanner.start(selectedCamera);
-                    mostrarFeedback('📱 Scanner Instascan ativo! Foque no QR Code', 'success');
-                    
+                    console.log(`📊 Estado carregado: ${itensSorteados.length} itens sorteados`);
                 } else {
-                    throw new Error('Nenhuma câmera encontrada');
-                }
-                
-            } catch (error) {
-                console.log('⚠️ Instascan falhou, tentando método tradicional:', error.message);
-                // Fallback para o método anterior
-                iniciarScannerTradicional();
-            }
-        }
-
-        // Método tradicional como fallback
-        async function iniciarScannerTradicional() {
-            console.log('� Usando método tradicional getUserMedia + jsQR...');
-            mostrarFeedback('📹 Scanner tradicional...', 'info');
-            
-            const video = document.getElementById('cameraVideo');
-            const canvas = document.getElementById('qrCanvas');
-            const context = canvas.getContext('2d');
-            const cameraContainer = document.getElementById('cameraContainer');
-            const botoesScanner = document.getElementById('botoesScanner');
-            
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({
-                    video: { 
-                        facingMode: { ideal: 'environment' },
-                        width: { ideal: 640 },
-                        height: { ideal: 480 }
-                    }
-                });
-                
-                video.srcObject = stream;
-                await video.play();
-                
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                
-                cameraContainer.style.display = 'block';
-                botoesScanner.style.display = 'none';
-                scannerAtivo = true;
-                
-                mostrarFeedback('📱 Scanner jsQR ativo!', 'success');
-                
-                // Loop de detecção
-                scannerInterval = setInterval(() => {
-                    if (!scannerAtivo) return;
-                    
-                    try {
-                        context.drawImage(video, 0, 0);
-                        const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-                        
-                        if (typeof jsQR !== 'undefined') {
-                            const code = jsQR(imageData.data, imageData.width, imageData.height);
-                            
-                            if (code) {
-                                console.log('📚 QR detectado via jsQR:', code.data);
-                                
-                                // Parar
-                                clearInterval(scannerInterval);
-                                scannerAtivo = false;
-                                stream.getTracks().forEach(track => track.stop());
-                                
-                                cameraContainer.style.display = 'none';
-                                botoesScanner.style.display = 'block';
-                                
-                                // Processar
-                                document.getElementById('qrText').value = code.data;
-                                validarCartela(code.data);
-                                
-                                mostrarFeedback('✅ QR lido com jsQR!', 'success');
-                            }
-                        }
-                    } catch (err) {
-                        console.error('Erro na detecção:', err);
-                    }
-                }, 150);
-                
-            } catch (error) {
-                console.error('❌ Erro no scanner tradicional:', error);
-                mostrarFeedback(`❌ Erro na câmera: ${error.message}`, 'error');
-            }
-        }
-
-        // Função para detectar capacidades do dispositivo
-        function detectarCapacidadesScanner() {
-            const capacidades = {
-                barcodeDetector: 'BarcodeDetector' in window,
-                getUserMedia: 'mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices,
-                jsQR: typeof jsQR !== 'undefined'
-            };
-            
-            console.log('📱 Capacidades de scanner detectadas:', capacidades);
-            return capacidades;
-        }
-
-        // Função para inicializar detector nativo
-        async function inicializarBarcodeDetector() {
-            try {
-                if ('BarcodeDetector' in window) {
-                    const formatos = await BarcodeDetector.getSupportedFormats();
-                    console.log('🎯 Formatos suportados pelo BarcodeDetector:', formatos);
-                    
-                    if (formatos.includes('qr_code')) {
-                        barcodeDetector = new BarcodeDetector({ formats: ['qr_code'] });
-                        return true;
-                    }
+                    console.log('📋 Nenhum estado salvo encontrado');
                 }
             } catch (error) {
-                console.log('⚠️ BarcodeDetector não disponível:', error.message);
+                console.error('❌ Erro ao carregar estado:', error);
             }
-            return false;
         }
 
-        // Função para iniciar a câmera e scanner com API moderna
+        // ========== SCANNER QR CODE ==========
+
         async function iniciarScanner() {
-            const video = document.getElementById('cameraVideo');
-            const canvas = document.getElementById('qrCanvas');
-            const context = canvas.getContext('2d');
-            const cameraContainer = document.getElementById('cameraContainer');
-            const botoesScanner = document.getElementById('botoesScanner');
-
-            mostrarFeedback('📷 Iniciando scanner QR...', 'info');
-            
-            const capacidades = detectarCapacidadesScanner();
-            
-            if (!capacidades.getUserMedia) {
-                mostrarFeedback('❌ Seu navegador não suporta acesso à câmera', 'error');
-                return;
-            }
-
             try {
-                // Verificar se BarcodeDetector está disponível
-                const temBarcodeDetector = await inicializarBarcodeDetector();
+                console.log('📷 Iniciando scanner...');
                 
-                // Configurações otimizadas para leitura de QR Code
-                const constraints = {
-                    video: {
-                        facingMode: { ideal: 'environment' }, // Câmera traseira
-                        width: { ideal: 1280, min: 640 },
-                        height: { ideal: 720, min: 480 }
-                    },
-                    audio: false
-                };
-
-                // iOS/Safari às vezes precisam de configurações mais específicas
-                const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-                if (isIOS) {
-                    constraints.video = {
-                        ...constraints.video,
-                        facingMode: 'environment', // Remove ideal para iOS
-                        focusMode: 'continuous',
-                        whiteBalanceMode: 'auto'
-                    };
-                }
-
-                videoStream = await navigator.mediaDevices.getUserMedia(constraints);
-                video.srcObject = videoStream;
-                
-                // Aguardar vídeo estar pronto
-                await new Promise(resolve => {
-                    video.onloadedmetadata = () => {
-                        video.play().then(resolve).catch(resolve);
-                    };
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'environment' }
                 });
-
-                // Configurar canvas
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-
-                // Mostrar interface do scanner
-                cameraContainer.style.display = 'block';
-                botoesScanner.style.display = 'none';
-                scannerAtivo = true;
-
-                if (temBarcodeDetector) {
-                    mostrarFeedback('🎯 Scanner nativo ativo! Aponte para o QR Code', 'success');
-                    iniciarDeteccaoNativa(video);
-                } else if (capacidades.jsQR) {
-                    mostrarFeedback('📚 Scanner jsQR ativo! Aponte para o QR Code', 'success');
-                    iniciarDeteccaoJsQR(video, canvas, context);
-                } else {
-                    throw new Error('Nenhuma biblioteca de QR Code disponível');
+                
+                const video = document.getElementById('scanner-video');
+                if (video) {
+                    video.srcObject = stream;
+                    video.style.display = 'block';
                 }
-
+                
+                const iniciarBtn = document.getElementById('iniciarScanner');
+                const pararBtn = document.getElementById('pararScanner');
+                
+                if (iniciarBtn) iniciarBtn.style.display = 'none';
+                if (pararBtn) pararBtn.style.display = 'inline-block';
+                
+                scanning = true;
+                detectarQRCode(video);
+                
+                console.log('✅ Scanner iniciado com sucesso');
+                
             } catch (error) {
-                console.error('Erro ao iniciar scanner:', error);
-                tratarErroScanner(error, cameraContainer, botoesScanner);
+                console.error('❌ Erro ao iniciar scanner:', error);
+                alert('Erro ao acessar a câmera: ' + error.message);
             }
         }
 
-        // Detecção com BarcodeDetector nativo (mais eficiente)
-        function iniciarDeteccaoNativa(video) {
-            console.log('🎯 Usando BarcodeDetector nativo');
-            
-            scannerInterval = setInterval(async () => {
-                if (!scannerAtivo || video.readyState !== video.HAVE_ENOUGH_DATA) return;
-
-                try {
-                    const barcodes = await barcodeDetector.detect(video);
-                    
-                    if (barcodes.length > 0) {
-                        const qrCode = barcodes[0]; // Pegar primeiro QR Code encontrado
-                        console.log('🎯 QR Code detectado:', qrCode.rawValue);
-                        
-                        processarQRCodeDetectado(qrCode.rawValue, '🎯 QR detectado com API nativa!');
-                    }
-                } catch (error) {
-                    console.error('Erro na detecção nativa:', error);
-                }
-            }, 200); // BarcodeDetector é mais eficiente, pode usar intervalo maior
-        }
-
-        // Detecção com jsQR (fallback)
-        function iniciarDeteccaoJsQR(video, canvas, context) {
-            console.log('📚 Usando jsQR fallback');
-            
-            scannerInterval = setInterval(() => {
-                if (!scannerAtivo || video.readyState !== video.HAVE_ENOUGH_DATA) return;
-
-                try {
-                    // Desenhar frame no canvas
-                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                    const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-                    
-                    // Detectar QR Code
-                    const code = jsQR(imageData.data, imageData.width, imageData.height, {
-                        inversionAttempts: "dontInvert" // Otimização para performance
-                    });
-                    
-                    if (code) {
-                        console.log('📚 QR Code detectado:', code.data);
-                        processarQRCodeDetectado(code.data, '📚 QR detectado com jsQR!');
-                    }
-                } catch (error) {
-                    console.error('Erro na detecção jsQR:', error);
-                }
-            }, 100); // jsQR precisa de verificações mais frequentes
-        }
-
-        // Processar QR Code detectado
-        function processarQRCodeDetectado(dadosQR, mensagem) {
-            // Parar scanner
-            pararScanner();
-            
-            // Preencher campo e validar
-            document.getElementById('qrText').value = dadosQR;
-            validarCartela(dadosQR);
-            
-            // Feedback com som
-            mostrarFeedback(mensagem, 'success');
-            
-            // Vibração se disponível
-            if ('vibrate' in navigator) {
-                navigator.vibrate([100, 50, 100]);
-            }
-        }
-
-        // Tratar erros do scanner
-        function tratarErroScanner(error, cameraContainer, botoesScanner) {
-            let mensagem = '';
-            
-            if (error.name === 'NotAllowedError') {
-                mensagem = '❌ Permissão de câmera negada. Permita e tente novamente.';
-            } else if (error.name === 'NotFoundError') {
-                mensagem = '❌ Câmera não encontrada. Use "Carregar Imagem".';
-            } else if (error.name === 'NotSupportedError') {
-                mensagem = '❌ Câmera não suportada. Use "Carregar Imagem".';
-            } else if (error.name === 'OverconstrainedError') {
-                mensagem = '⚠️ Tentando com câmera frontal...';
-                // Tentar com câmera frontal
-                tentarCameraFrontal();
-                return;
-            } else {
-                mensagem = `❌ Erro: ${error.message}. Use "Carregar Imagem".`;
-            }
-            
-            mostrarFeedback(mensagem, 'error');
-            cameraContainer.style.display = 'none';
-            botoesScanner.style.display = 'block';
-        }
-
-        // Fallback para câmera frontal
-        async function tentarCameraFrontal() {
-            try {
-                const video = document.getElementById('cameraVideo');
-                
-                mostrarFeedback('📷 Tentando câmera frontal...', 'info');
-                
-                if (videoStream) {
-                    videoStream.getTracks().forEach(track => track.stop());
-                }
-
-                videoStream = await navigator.mediaDevices.getUserMedia({
-                    video: { 
-                        facingMode: 'user', // Câmera frontal
-                        width: 640,
-                        height: 480
-                    }
-                });
-
-                video.srcObject = videoStream;
-                await video.play();
-                
-                const canvas = document.getElementById('qrCanvas');
-                const context = canvas.getContext('2d');
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-
-                scannerAtivo = true;
-                mostrarFeedback('📱 Câmera frontal ativa! Vire o celular para o QR', 'success');
-                
-                // Usar jsQR para câmera frontal (mais compatível)
-                iniciarDeteccaoJsQR(video, canvas, context);
-                
-            } catch (fallbackError) {
-                console.error('Erro na câmera frontal:', fallbackError);
-                tratarErroScanner(fallbackError, 
-                    document.getElementById('cameraContainer'),
-                    document.getElementById('botoesScanner')
-                );
-            }
-        }
-
-        // Função para parar o scanner - versão melhorada
         function pararScanner() {
-            console.log('🛑 Parando todos os scanners...');
-            scannerAtivo = false;
+            console.log('⏹️ Parando scanner...');
             
-            // Parar intervalo jsQR
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+            
+            scanning = false;
             if (scannerInterval) {
                 clearInterval(scannerInterval);
                 scannerInterval = null;
             }
             
-            // Parar streams de vídeo
-            if (videoStream) {
-                videoStream.getTracks().forEach(track => track.stop());
-                videoStream = null;
-            }
+            const video = document.getElementById('scanner-video');
+            const iniciarBtn = document.getElementById('iniciarScanner');
+            const pararBtn = document.getElementById('pararScanner');
             
-            // Parar Instascan se existir
-            try {
-                if (typeof Instascan !== 'undefined' && window.instascanScanner) {
-                    window.instascanScanner.stop();
-                    window.instascanScanner = null;
-                }
-            } catch (e) {
-                console.log('Instascan já parado');
-            }
-
-            // Parar vídeo
-            const video = document.getElementById('cameraVideo');
-            const cameraContainer = document.getElementById('cameraContainer');
-            const botoesScanner = document.getElementById('botoesScanner');
-
-            if (video) {
-                video.srcObject = null;
-                video.pause();
-            }
+            if (video) video.style.display = 'none';
+            if (iniciarBtn) iniciarBtn.style.display = 'inline-block';
+            if (pararBtn) pararBtn.style.display = 'none';
             
-            if (cameraContainer) cameraContainer.style.display = 'none';
-            if (botoesScanner) botoesScanner.style.display = 'block';
-            
-            mostrarFeedback('🛑 Scanner parado', 'info');
+            console.log('✅ Scanner parado');
         }
 
-        // Função para mostrar feedback visual
-        function mostrarFeedback(mensagem, tipo) {
-            // Criar elemento de feedback
-            const feedback = document.createElement('div');
-            feedback.style.cssText = `
-                position: fixed;
-                top: 20px;
-                left: 50%;
-                transform: translateX(-50%);
-                padding: 15px 20px;
-                border-radius: 10px;
-                color: white;
-                font-weight: bold;
-                z-index: 10000;
-                max-width: 90%;
-                text-align: center;
-                box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            `;
-            
-            if (tipo === 'success') {
-                feedback.style.background = 'linear-gradient(45deg, #4caf50, #66bb6a)';
-            } else if (tipo === 'error') {
-                feedback.style.background = 'linear-gradient(45deg, #f44336, #ef5350)';
-            } else {
-                feedback.style.background = 'linear-gradient(45deg, #2196f3, #64b5f6)';
-            }
-            
-            feedback.textContent = mensagem;
-            document.body.appendChild(feedback);
-            
-            // Remover após 4 segundos
-            setTimeout(() => {
-                if (feedback.parentNode) {
-                    feedback.parentNode.removeChild(feedback);
-                }
-            }, 4000);
-        }
-
-        // Configurar event listeners
-        function configurarEventListeners() {
-            document.getElementById('sortearItem').addEventListener('click', sortearItem);
-            document.getElementById('reiniciarSorteio').addEventListener('click', reiniciarSorteio);
-            
-            // Event listeners para o scanner de câmera - VERSÃO SIMPLIFICADA
-            document.getElementById('iniciarCamera').addEventListener('click', testarCameraSimplesmente);
-            document.getElementById('pararCamera').addEventListener('click', pararScanner);
-            
-            document.getElementById('uploadQR').addEventListener('click', () => {
-                document.getElementById('qrInput').click();
-            });
-
-            document.getElementById('qrInput').addEventListener('change', (event) => {
-                const file = event.target.files[0];
-                if (file) {
-                    lerQRCodeDeImagem(file);
-                }
-            });
-
-            document.getElementById('validarTexto').addEventListener('click', () => {
-                const texto = document.getElementById('qrText').value.trim();
-                if (texto) {
-                    validarCartela(texto);
-                } else {
-                    mostrarFeedback('Por favor, cole o texto do QR Code no campo acima.', 'error');
-                }
-            });
-        }
-
-        // Ler QR Code de imagem
-        function lerQRCodeDeImagem(file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const img = new Image();
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    const context = canvas.getContext('2d');
-                    canvas.width = img.width;
-                    canvas.height = img.height;
-                    context.drawImage(img, 0, 0);
-                    
-                    const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-                    
-                    if (typeof jsQR !== 'undefined') {
-                        const code = jsQR(imageData.data, imageData.width, imageData.height);
-                        
-                        if (code) {
-                            document.getElementById('qrText').value = code.data;
-                            validarCartela(code.data);
-                            mostrarFeedback('✅ QR Code encontrado na imagem!', 'success');
-                        } else {
-                            mostrarFeedback('❌ QR Code não encontrado na imagem. Tente uma imagem mais clara ou cole o texto manualmente.', 'error');
-                        }
-                    } else {
-                        mostrarFeedback('❌ Biblioteca de leitura de QR Code não está disponível. Por favor, copie e cole o texto do QR Code manualmente.', 'error');
-                    }
-                };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
-
-        // Inicializar quando a página carregar
-        document.addEventListener('DOMContentLoaded', () => {
-            inicializar();
-            carregarEstadoSorteio();
-        });
-        
-        // Função para verificar bibliotecas disponíveis
-        function verificarBibliotecas() {
-            console.log('🔍 Verificando bibliotecas disponíveis...');
-            
-            const bibliotecas = {
-                'jsQR': typeof jsQR !== 'undefined',
-                'QRCode (npm)': typeof QRCode !== 'undefined' && QRCode.toCanvas,
-                'QRCode (js)': typeof QRCode !== 'undefined' && !QRCode.toCanvas,
-                'QRious': typeof QRious !== 'undefined',
-                'Instascan': typeof Instascan !== 'undefined',
-                'Quagga': typeof Quagga !== 'undefined'
-            };
-            
-            let relatorio = '📚 Bibliotecas Disponíveis:\n\n';
-            for (const [nome, disponivel] of Object.entries(bibliotecas)) {
-                relatorio += `${disponivel ? '✅' : '❌'} ${nome}\n`;
-            }
-            
-            console.log(relatorio);
-            alert(relatorio);
-            mostrarFeedback('🔍 Relatório de bibliotecas exibido no console', 'info');
-        }
-        
-        // ==================== SCANNER ESPECIAL IPHONE ====================
-        
-        // Função para gerar QR Code de teste
-        function gerarQRCodeTeste() {
-            console.log('🧪 Gerando QR Code de teste...');
-            
-            // TESTE: Gerar QR Code com dados iguais aos das cartelas
-            const dadosCartelaSimulada = {
-                numero: 999,
-                evento: 'Chá de Panela da Mari',
-                timestamp: new Date().toISOString(),
-                itens: ['Panela', 'Colher', 'Garfo', 'Faca'],
-                hash: 'teste123'
-            };
-            
-            const jsonTeste = JSON.stringify(dadosCartelaSimulada);
-            console.log('🧪 Dados do QR de teste (formato cartela):', jsonTeste);
-            
-            // Criar QR Code
-            const qrContainer = document.createElement('div');
-            qrContainer.style.cssText = `
-                position: fixed;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                background: white;
-                padding: 20px;
-                border-radius: 10px;
-                box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-                z-index: 1000;
-                text-align: center;
-            `;
-            
-            qrContainer.innerHTML = `
-                <h3>🧪 QR Code de Teste</h3>
-                <div id="qrTeste" style="margin: 15px 0;"></div>
-                <p style="font-size: 12px; color: #666;">JSON: ${jsonTeste}</p>
-                <button onclick="this.parentElement.remove()" style="background: #f44336; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
-                    ❌ Fechar
-                </button>
-            `;
-            
-            document.body.appendChild(qrContainer);
-            
-            // Tentar diferentes métodos de gerar QR Code
-            const qrDiv = document.getElementById('qrTeste');
-            
-            // Método 1: qrcode.js (mais compatível)
-            if (typeof QRCode !== 'undefined') {
-                console.log('✅ Usando qrcode.js');
-                try {
-                    new QRCode(qrDiv, {
-                        text: jsonTeste,
-                        width: 200,
-                        height: 200,
-                        colorDark: '#000000',
-                        colorLight: '#ffffff',
-                        correctLevel: QRCode.CorrectLevel.M
-                    });
-                } catch(error) {
-                    console.error('❌ Erro com qrcode.js:', error);
-                    tentarMetodo2();
-                }
-            } else {
-                tentarMetodo2();
-            }
-            
-            function tentarMetodo2() {
-                // Método 2: QR Code via API
-                console.log('🔄 Tentando API QR...');
-                const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(jsonTeste)}`;
-                qrDiv.innerHTML = `<img src="${qrUrl}" alt="QR Code" style="width: 200px; height: 200px;">`;
-            }
-            
-            mostrarFeedback('🧪 QR Code de teste gerado! Use o scanner para testá-lo.', 'info');
-        }
-        
-        // Função específica para iPhone - evita transmissão ao vivo
-        function abrirCameraFotoUnica() {
-            console.log('📷 Abrindo câmera para foto única (iPhone)...');
-            mostrarFeedback('📷 Preparando câmera para foto...', 'info');
-            
-            // Criar input file com capture
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'image/*';
-            input.capture = 'environment'; // Câmera traseira
-            input.style.display = 'none';
-            
-            input.addEventListener('change', function(event) {
-                const file = event.target.files[0];
-                if (file) {
-                    console.log('📸 Foto capturada, analisando QR Code...');
-                    mostrarFeedback('📸 Analisando foto para QR Code...', 'info');
-                    lerQRCodeDeImagem(file);
-                } else {
-                    mostrarFeedback('❌ Nenhuma foto selecionada', 'error');
-                }
-                // Limpar
-                document.body.removeChild(input);
-            });
-            
-            // Adicionar ao DOM e disparar
-            document.body.appendChild(input);
-            input.click();
-        }
-        
-        // Função única para validar cartela com WebRTC otimizado
-        async function validarCartelaComWebRTC() {
-            console.log('🎯 Iniciando validação de cartela...');
-            mostrarFeedback('🎯 Preparando scanner WebRTC otimizado...', 'info');
-            
-            // Verificar se jsQR está disponível
-            if (typeof jsQR === 'undefined') {
-                console.error('❌ jsQR não está carregado!');
-                mostrarFeedback('❌ Biblioteca jsQR não carregada - recarregue a página', 'error');
+        function detectarQRCode(video) {
+            if (!video) {
+                console.error('❌ Elemento de vídeo não encontrado');
                 return;
             }
-            console.log('✅ jsQR disponível:', typeof jsQR);
             
-            try {
-                // Configurações WebRTC otimizadas para evitar modo transmissão
-                const constraints = {
-                    video: {
-                        facingMode: 'environment', // Câmera traseira
-                        width: { ideal: 1280, max: 1920 },
-                        height: { ideal: 720, max: 1080 },
-                        frameRate: { ideal: 15, max: 30 }, // FPS reduzido
-                        focusMode: 'continuous',
-                        exposureMode: 'continuous',
-                        // Configurações específicas para iOS
-                        aspectRatio: 16/9,
-                        resizeMode: 'crop-and-scale'
-                    },
-                    audio: false // Sem áudio para evitar problemas
-                };
-                
-                console.log('📹 Solicitando acesso à câmera...');
-                const stream = await navigator.mediaDevices.getUserMedia(constraints);
-                console.log('✅ Stream de câmera obtido');
-                iniciarScannerWebRTCOtimizado(stream);
-                
-            } catch (error) {
-                console.error('❌ Erro ao acessar câmera:', error);
-                mostrarFeedback('❌ Erro ao acessar câmera: ' + error.message, 'error');
-                
-                // Fallback para entrada de arquivo
-                mostrarFeedback('� Tentando método alternativo...', 'info');
-                document.getElementById('qrInput').click();
-            }
-        }
-        
-        // Scanner WebRTC otimizado
-        function iniciarScannerWebRTCOtimizado(stream) {
-            console.log('🚀 Iniciando scanner WebRTC otimizado...');
-            const video = document.getElementById('cameraVideo');
-            const canvas = document.getElementById('qrCanvas');
+            const canvas = document.createElement('canvas');
             const context = canvas.getContext('2d');
-            
-            // Mostrar container da câmera
-            document.getElementById('cameraContainer').style.display = 'block';
-            document.getElementById('botoesScanner').style.display = 'none';
-            
-            // Configurar vídeo
-            video.srcObject = stream;
-            video.setAttribute('playsinline', true);
-            video.setAttribute('webkit-playsinline', true);
-            video.setAttribute('muted', true);
-            
-            video.onloadedmetadata = function() {
+
+            scannerInterval = setInterval(() => {
+                if (!scanning || !video || video.videoWidth === 0) return;
+
                 canvas.width = video.videoWidth;
                 canvas.height = video.videoHeight;
-                video.play();
-                
-                console.log(`📐 Vídeo configurado: ${video.videoWidth}x${video.videoHeight}`);
-                mostrarFeedback('📹 Scanner ativo - posicione o QR Code na tela', 'success');
-                
-                let scanCount = 0;
-                
-                // Scanner loop otimizado
-                const scanInterval = setInterval(() => {
-                    if (video.readyState === video.HAVE_ENOUGH_DATA) {
-                        scanCount++;
-                        
-                        // Log a cada 10 tentativas
-                        if (scanCount % 10 === 0) {
-                            console.log(`🔍 Tentativa de scan #${scanCount}`);
-                        }
-                        
-                        context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                        const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-                        
-                        // Tentar ler QR Code com jsQR
-                        try {
-                            const code = jsQR(imageData.data, imageData.width, imageData.height, {
-                                inversionAttempts: "dontInvert", // Melhor performance
-                            });
-                            
-                            if (code) {
-                                console.log('✅ QR Code detectado!', code.data);
-                                
-                                // Parar scanner e fechar câmera AUTOMATICAMENTE
-                                clearInterval(scanInterval);
-                                pararCamera(stream);
-                                
-                                // Mostrar feedback de sucesso
-                                mostrarFeedback('✅ QR Code lido - câmera fechada automaticamente!', 'success');
-                                
-                                // Processar resultado
-                                processarQRCodeDetectado(code.data, '✅ QR lido via WebRTC!');
-                                return;
-                            }
-                        } catch (jsQRError) {
-                            console.error('❌ Erro no jsQR:', jsQRError);
-                        }
-                    }
-                }, 200); // Scanner mais frequente: a cada 200ms
-                
-                // Timeout para evitar uso excessivo da câmera - fecha automaticamente
-                setTimeout(() => {
-                    console.log('⏱️ Timeout do scanner após 30 segundos');
-                    clearInterval(scanInterval);
-                    pararCamera(stream);
-                    mostrarFeedback('⏱️ Tempo esgotado - câmera fechada automaticamente', 'warning');
-                }, 30000); // 30 segundos máximo
-            };
-        }
-        
-        // Parar câmera completamente
-        function pararCamera(stream) {
-            if (stream) {
-                stream.getTracks().forEach(track => {
-                    track.stop();
-                });
-            }
-            const video = document.getElementById('cameraVideo');
-            if (video.srcObject) {
-                video.srcObject = null;
-            }
-            
-            // Ocultar interface da câmera
-            document.getElementById('cameraContainer').style.display = 'none';
-            document.getElementById('botoesScanner').style.display = 'block';
-        }
-        
-        // Executar ao carregar a página
-        document.addEventListener('DOMContentLoaded', function() {
-            carregarEstadoSorteio();
-        });
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
+                const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+                
+                if (typeof jsQR !== 'undefined') {
+                    const qrCode = jsQR(imageData.data, canvas.width, canvas.height);
+
+                    if (qrCode) {
+                        console.log('📱 QR Code detectado:', qrCode.data);
+                        pararScanner();
+                        validarCartela(qrCode.data);
+                    }
+                } else {
+                    console.error('❌ Biblioteca jsQR não carregada');
+                }
+            }, 250); // Reduzido para 250ms para melhor performance
+        }
+
+        function validarCartela(dadosQR) {
+            try {
+                console.log('🔍 Validando cartela:', dadosQR);
+                
+                let cartelaId = dadosQR;
+                let dadosCartela = null;
+                
+                // Sistema novo (ID simples)
+                if (typeof dadosQR === 'string' && dadosQR.match(/^MARI\d+/)) {
+                    const database = JSON.parse(localStorage.getItem('cartelasDatabase') || '{}');
+                    dadosCartela = database[cartelaId];
+                    
+                    if (!dadosCartela) {
+                        throw new Error(`Cartela ${cartelaId} não encontrada na base de dados`);
+                    }
+                } else {
+                    // Sistema antigo (JSON)
+                    try {
+                        dadosCartela = JSON.parse(dadosQR);
+                        cartelaId = dadosCartela.hash || `Cartela-${dadosCartela.numero}`;
+                    } catch (parseError) {
+                        throw new Error('QR Code inválido - não é um JSON válido nem um ID de cartela');
+                    }
+                }
+
+                // Verificar status da cartela
+                const itensCartela = dadosCartela.itens;
+                const cartelaSorteados = itensCartela.filter(item => itensSorteados.includes(item));
+                const cartelaNaoSorteados = itensCartela.filter(item => !itensSorteados.includes(item));
+                const isVencedor = cartelaNaoSorteados.length === 0;
+
+                // Mostrar resultado
+                const resultadoDiv = document.getElementById('resultadoValidacao');
+                const infoDiv = document.getElementById('cartelaInfo');
+                
+                if (resultadoDiv) {
+                    resultadoDiv.style.display = 'block';
+                    
+                    if (isVencedor) {
+                        resultadoDiv.className = 'resultado-validacao vencedor';
+                        resultadoDiv.innerHTML = '🎉 CARTELA VENCEDORA! 🎉<br>BINGO VÁLIDO!';
+                        
+                        if ('vibrate' in navigator) {
+                            navigator.vibrate([200, 100, 200]);
+                        }
+                    } else {
+                        resultadoDiv.className = 'resultado-validacao perdedor';
+                        resultadoDiv.innerHTML = `❌ Cartela incompleta<br>Faltam ${cartelaNaoSorteados.length} item(ns)`;
+                    }
+                }
+
+                if (infoDiv) {
+                    const progresso = Math.round((cartelaSorteados.length / itensCartela.length) * 100);
+                    
+                    infoDiv.style.display = 'block';
+                    infoDiv.innerHTML = `
+                        <h4>📋 Cartela ${dadosCartela.numero}</h4>
+                        <p><strong>ID:</strong> ${cartelaId}</p>
+                        <p><strong>Progresso:</strong> ${progresso}% (${cartelaSorteados.length}/${itensCartela.length})</p>
+                        
+                        <h5>✅ Itens sorteados (${cartelaSorteados.length}):</h5>
+                        <p>${cartelaSorteados.join(', ') || 'Nenhum'}</p>
+                        
+                        ${cartelaNaoSorteados.length > 0 ? `
+                        <h5>⏳ Itens restantes (${cartelaNaoSorteados.length}):</h5>
+                        <p>${cartelaNaoSorteados.join(', ')}</p>
+                        ` : ''}
+                    `;
+                }
+
+                console.log(`✅ Validação concluída: ${isVencedor ? 'VENCEDOR' : 'INCOMPLETA'}`);
+
+            } catch (error) {
+                console.error('❌ Erro na validação:', error);
+                
+                const resultadoDiv = document.getElementById('resultadoValidacao');
+                const infoDiv = document.getElementById('cartelaInfo');
+                
+                if (resultadoDiv) {
+                    resultadoDiv.style.display = 'block';
+                    resultadoDiv.className = 'resultado-validacao perdedor';
+                    resultadoDiv.innerHTML = `❌ Erro: ${error.message}`;
+                }
+                
+                if (infoDiv) {
+                    infoDiv.style.display = 'block';
+                    infoDiv.innerHTML = `
+                        <h4>⚠️ Erro na Validação</h4>
+                        <p>QR Code inválido ou cartela não encontrada</p>
+                        <p><strong>Dados:</strong> ${dadosQR.substring(0, 100)}...</p>
+                    `;
+                }
+            }
+        }
+
+        // Debug para verificar se o script carregou
+        console.log('✅ Script carregado completamente!');
     </script>
 </body>
 </html>
