@@ -543,44 +543,43 @@
             return hash.toString();
         }
 
-        // Validar cartela através do QR Code
+        // Validar cartela através do QR Code (Sistema atualizado com ID)
         function validarCartela(dadosQR) {
             try {
-                let dadosCartela;
-                
                 console.log('🔍 Dados recebidos para validação:', dadosQR);
                 
-                // Tentar fazer parse do JSON
-                try {
-                    dadosCartela = JSON.parse(dadosQR);
-                    console.log('📋 Dados da cartela parseados:', dadosCartela);
-                } catch (parseError) {
-                    console.error('❌ Erro no parse JSON:', parseError);
-                    throw new Error('QR Code não contém dados válidos de cartela');
-                }
+                let cartelaId = dadosQR;
+                let dadosCartela = null;
                 
-                // Verificar se tem a estrutura esperada
-                if (!dadosCartela.numero || !dadosCartela.itens || !dadosCartela.hash) {
-                    console.error('❌ Dados faltando:', {
-                        numero: !!dadosCartela.numero,
-                        itens: !!dadosCartela.itens,
-                        hash: !!dadosCartela.hash
-                    });
-                    throw new Error('QR Code não contém todos os dados necessários (número, itens, hash)');
+                // VERIFICAR SE É UM ID SIMPLES (novo sistema)
+                if (typeof dadosQR === 'string' && dadosQR.match(/^MARI\d+/)) {
+                    console.log('� Detectado ID de cartela:', cartelaId);
+                    
+                    // CARREGAR BASE DE DADOS DO LOCALSTORAGE
+                    const database = JSON.parse(localStorage.getItem('cartelasDatabase') || '{}');
+                    console.log('📊 Base de dados carregada:', Object.keys(database).length, 'cartelas');
+                    
+                    // BUSCAR DADOS DA CARTELA
+                    dadosCartela = database[cartelaId];
+                    
+                    if (!dadosCartela) {
+                        throw new Error(`Cartela com ID "${cartelaId}" não encontrada na base de dados. Certifique-se de que as cartelas foram geradas nesta sessão.`);
+                    }
+                    
+                    console.log('✅ Cartela encontrada na base:', dadosCartela);
+                    
+                } else {
+                    // TENTAR SISTEMA ANTIGO (JSON)
+                    try {
+                        dadosCartela = JSON.parse(dadosQR);
+                        cartelaId = dadosCartela.hash || `Cartela-${dadosCartela.numero}`;
+                        console.log('📋 Dados da cartela (sistema antigo):', dadosCartela);
+                    } catch (parseError) {
+                        throw new Error('QR Code não é um ID válido nem contém dados JSON válidos');
+                    }
                 }
 
-                console.log('🔒 Verificando integridade da cartela...');
-                
-                // Verificar integridade dos dados
-                const hashEsperado = gerarHashCartela(dadosCartela.numero, dadosCartela.itens);
-                console.log('🔑 Hash esperado:', hashEsperado, 'Hash recebido:', dadosCartela.hash);
-                
-                if (hashEsperado !== dadosCartela.hash) {
-                    console.error('❌ Hash não confere!');
-                    throw new Error('Cartela pode ter sido alterada (hash não confere)');
-                }
-
-                console.log('✅ Integridade verificada! Analisando items...');
+                console.log('🔒 Analisando cartela...');
                 console.log('🎲 Itens sorteados até agora:', itensSorteados);
                 console.log('📋 Itens da cartela:', dadosCartela.itens);
 
@@ -590,7 +589,7 @@
                 const itensNaoSorteados = itensCartela.filter(item => !itensSorteados.includes(item));
                 const isVencedor = itensNaoSorteados.length === 0;
                 
-                console.log('📊 Análise da cartela:', {
+                console.log('� Análise da cartela:', {
                     totalItens: itensCartela.length,
                     itensSorteados: itensCartelaSorteados.length,
                     itensRestantes: itensNaoSorteados.length,
@@ -644,6 +643,7 @@
                     
                     cartelaInfoDiv.innerHTML = `
                         <h4>📋 Cartela ${dadosCartela.numero} - Detalhes</h4>
+                        <p><strong>🆔 ID:</strong> ${cartelaId}</p>
                         
                         <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; margin: 10px 0;">
                             <h5 style="margin: 0 0 10px 0; color: #4caf50;">✅ Itens já sorteados (${itensCartelaSorteados.length}/${itensCartela.length})</h5>
@@ -664,7 +664,7 @@
                         <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 10px 0;">
                             <p><strong>📊 Progresso:</strong> ${progressoCartela}% completa</p>
                             <p><strong>🎪 Evento:</strong> ${dadosCartela.evento || 'Chá de Panela da Mari'}</p>
-                            <p><strong>📅 Gerada em:</strong> ${dadosCartela.timestamp ? new Date(dadosCartela.timestamp).toLocaleString('pt-BR') : 'N/A'}</p>
+                            <p><strong>📅 Gerada em:</strong> ${dadosCartela.criadaEm ? new Date(dadosCartela.criadaEm).toLocaleString('pt-BR') : 'N/A'}</p>
                             <p><strong>🎲 Total de itens sorteados no jogo:</strong> ${itensSorteados.length}</p>
                         </div>
                     `;
@@ -691,12 +691,98 @@
                         <p style="color: #e91e63;">${error.message}</p>
                         <p><strong>Dica:</strong> Certifique-se de que:</p>
                         <ul>
+                            <li>As cartelas foram geradas na mesma sessão/navegador</li>
                             <li>O QR Code é de uma cartela válida deste jogo</li>
-                            <li>A cartela não foi alterada manualmente</li>
                             <li>O QR Code não está danificado</li>
                         </ul>
                         <p><strong>Dados recebidos:</strong></p>
                         <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px; font-size: 12px; overflow-x: auto;">${dadosQR.substring(0, 200)}${dadosQR.length > 200 ? '...' : ''}</pre>
+                        
+                        <p><strong>Base de dados:</strong></p>
+                        <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px; font-size: 12px; overflow-x: auto;">${Object.keys(JSON.parse(localStorage.getItem('cartelasDatabase') || '{}')).join(', ') || 'Vazia'}</pre>
+                    `;
+                }
+            }
+        }
+                        const oscillator = audioContext.createOscillator();
+                        const gainNode = audioContext.createGain();
+                        
+                        oscillator.connect(gainNode);
+                        gainNode.connect(audioContext.destination);
+                        
+                        oscillator.frequency.value = 800;
+                        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                        
+                        oscillator.start();
+                        oscillator.stop(audioContext.currentTime + 0.5);
+                    } catch (e) {}
+                    
+                } else {
+                    if (resultadoDiv) {
+                        resultadoDiv.className = 'resultado-validacao perdedor';
+                        resultadoDiv.innerHTML = `❌ Cartela ainda não vencedora<br>Faltam ${itensNaoSorteados.length} item(ns)`;
+                    }
+                }
+
+                // Mostrar informações detalhadas da cartela
+                if (cartelaInfoDiv) {
+                    const progressoCartela = Math.round((itensCartelaSorteados.length / itensCartela.length) * 100);
+                    
+                    cartelaInfoDiv.innerHTML = `
+                        <h4>📋 Cartela ${dadosCartela.numero} - Detalhes</h4>
+                        
+                        <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; margin: 10px 0;">
+                            <h5 style="margin: 0 0 10px 0; color: #4caf50;">✅ Itens já sorteados (${itensCartelaSorteados.length}/${itensCartela.length})</h5>
+                            <div style="font-size: 14px; color: #2e7d32;">
+                                ${itensCartelaSorteados.length > 0 ? itensCartelaSorteados.map(item => `<span style="background: #4caf50; color: white; padding: 2px 6px; border-radius: 3px; margin: 2px; display: inline-block;">${item}</span>`).join(' ') : '<em>Nenhum item sorteado ainda</em>'}
+                            </div>
+                        </div>
+                        
+                        ${itensNaoSorteados.length > 0 ? `
+                        <div style="background: #ffeaea; padding: 15px; border-radius: 8px; margin: 10px 0;">
+                            <h5 style="margin: 0 0 10px 0; color: #e91e63;">⏳ Itens ainda não sorteados (${itensNaoSorteados.length})</h5>
+                            <div style="font-size: 14px; color: #c62828;">
+                                ${itensNaoSorteados.map(item => `<span style="background: #e91e63; color: white; padding: 2px 6px; border-radius: 3px; margin: 2px; display: inline-block;">${item}</span>`).join(' ')}
+                            </div>
+                        </div>
+                        ` : ''}
+                        
+                        <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 10px 0;">
+                            <p><strong>📊 Progresso:</strong> ${progressoCartela}% completa</p>
+                            <p><strong>🎪 Evento:</strong> ${dadosCartela.evento || 'Chá de Panela da Mari'}</p>
+                            <p><strong>📅 Gerada em:</strong> ${dadosCartela.criadaEm ? new Date(dadosCartela.criadaEm).toLocaleString('pt-BR') : 'N/A'}</p>
+                            <p><strong>🎲 Total de itens sorteados no jogo:</strong> ${itensSorteados.length}</p>
+                        </div>
+                    `;
+                }
+
+                console.log('✅ Validação concluída com sucesso!');
+
+            } catch (error) {
+                console.error('❌ Erro na validação:', error);
+                
+                const resultadoDiv = document.getElementById('resultadoValidacao');
+                const cartelaInfoDiv = document.getElementById('cartelaInfo');
+                
+                if (resultadoDiv) {
+                    resultadoDiv.style.display = 'block';
+                    resultadoDiv.className = 'resultado-validacao perdedor';
+                    resultadoDiv.innerHTML = `❌ Erro na validação<br>${error.message}`;
+                }
+                
+                if (cartelaInfoDiv) {
+                    cartelaInfoDiv.style.display = 'block';
+                    cartelaInfoDiv.innerHTML = `
+                        <h4>⚠️ Erro na Validação</h4>
+                        <p style="color: #e91e63;">${error.message}</p>
+                        <p><strong>Dica:</strong> Certifique-se de que:</p>
+                        <ul>
+                            <li>As cartelas foram geradas na mesma sessão/navegador</li>
+                            <li>O QR Code é de uma cartela válida deste jogo</li>
+                            <li>O QR Code não está danificado</li>
+                        </ul>
+                        <p><strong>Dados recebidos:</strong></p>
+                        <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px; font-size: 12px; overflow-x: auto;">${dadosQR}</pre>
                     `;
                 }
             }
