@@ -108,101 +108,42 @@ window.cartelasDatabase = window.cartelasDatabase || {};
 
 // FUNÇÃO SUPER SIMPLES PARA QR CODE
 function gerarQRCodeMini(numeroCartela) {
-    console.log(`🚀 Gerando QR para cartela ${numeroCartela}`);
-    
     const elemento = document.getElementById(`qr-mini-${numeroCartela}`);
-    if (!elemento) {
-        console.error(`❌ Elemento qr-mini-${numeroCartela} não encontrado!`);
-        return;
-    }
+    if (!elemento) return;
     
     // Buscar os itens da cartela
     const cartelaElemento = elemento.closest('.cartela');
     const itensCartela = JSON.parse(cartelaElemento.dataset.itens);
     
-    console.log(`✅ Elemento encontrado para cartela ${numeroCartela}`);
+    // Converter para chaves simples
+    const chaves = itensCartela.map(item => obterChaveItem(item)).filter(chave => chave);
     
-    // FORÇAR VISIBILIDADE DO ELEMENTO
-    elemento.style.display = 'block';
-    elemento.style.visibility = 'visible';
-    elemento.style.opacity = '1';
-    elemento.style.width = '50px';
-    elemento.style.height = '50px';
-    elemento.style.position = 'relative';
-    elemento.style.zIndex = '999';
+    // QR CODE SUPER SIMPLES - só as chaves
+    const textoQR = chaves.join(',');
+    const url = `https://api.qrserver.com/v1/create-qr-code/?size=40x40&data=${encodeURIComponent(textoQR)}`;
     
-    // CRIAR ID ÚNICO SIMPLES
-    const cartelaId = `MARI${numeroCartela.toString().padStart(2, '0')}${Date.now().toString().slice(-4)}`;
-    
-    // CRIAR DADOS COMPLETOS PARA O QR CODE
-    const dadosCompletos = {
-        id: cartelaId,
-        numero: numeroCartela,
-        itens: itensCartela,
-        evento: 'Chá de Panela da Mari',
-        criadaEm: new Date().toISOString()
-    };
-    
-    // ARMAZENAR NA BASE DE DADOS LOCAL (para uso no mesmo dispositivo)
-    window.cartelasDatabase[cartelaId] = dadosCompletos;
-    
-    // QR CODE COM CHAVES SIMPLES
-    const chavesItens = itensCartela.map(item => obterChaveItem(item)).filter(chave => chave);
-    const textoQR = JSON.stringify(chavesItens);
-    const url = `https://api.qrserver.com/v1/create-qr-code/?size=50x50&data=${encodeURIComponent(textoQR)}`;
-    
-    // REMOVER BORDAS DE DEBUG E USAR COR PRETA
-    elemento.style.border = 'none';
-    elemento.style.backgroundColor = 'transparent';
-    elemento.innerHTML = `<img src="${url}" style="width:50px!important;height:50px!important;display:block!important;" onload="console.log('✅ QR ${numeroCartela} (${textoQR.length} chars)')" onerror="console.error('❌ QR ${numeroCartela} falhou')">`;
-    
-    console.log(`📡 Cartela ${numeroCartela} - QR com ${chavesItens.length} chaves`);
-    console.log(`📏 Tamanho dos dados: ${textoQR.length} caracteres`);
-    console.log(`🔑 Chaves: ${chavesItens.join(', ')}`);
-    
-    // Verificar se o elemento pai tem problemas de CSS
-    const pai = elemento.parentElement;
-    if (pai) {
-        pai.style.overflow = 'visible';
-        pai.style.display = 'flex';
-        pai.style.alignItems = 'center';
-        pai.style.justifyContent = 'center';
-    }
+    elemento.innerHTML = `<img src="${url}" style="width:40px;height:40px;">`;
 }
 
 function gerarTodasCartelas() {
-    console.log('🎯 FUNÇÃO CHAMADA!');
-    
     const container = document.getElementById('cartelas-container');
-    if (!container) {
-        console.error('Container não encontrado!');
-        alert('Container não encontrado!');
-        return;
-    }
+    if (!container) return;
     
-    // Quantidade fixa de 35 cartelas (como indica o botão)
     const quantidadeCartelas = 35;
-    console.log('Quantidade:', quantidadeCartelas);
-    
-    console.log(`Iniciando geração de ${quantidadeCartelas} cartelas...`);
     container.innerHTML = '';
     
-    // Primeiro criar todas as cartelas
+    // Criar todas as cartelas
     for (let i = 1; i <= quantidadeCartelas; i++) {
-        console.log(`Criando cartela ${i}...`);
         const cartela = gerarCartela(i);
         container.appendChild(cartela);
     }
     
-    console.log('Todas as cartelas foram adicionadas ao DOM');
-    
-    // Agora gerar todos os QR codes
+    // Gerar todos os QR codes
     for (let i = 1; i <= quantidadeCartelas; i++) {
-        console.log(`Gerando QR code para cartela ${i}`);
         gerarQRCodeMini(i);
     }
     
-    // HABILITAR BOTÕES DE DOWNLOAD/PDF
+    // Habilitar botões de download
     ['gerarPDF', 'gerarPDFDireto', 'imprimirCartelas'].forEach(id => {
         const botao = document.getElementById(id);
         if (botao) {
@@ -210,22 +151,10 @@ function gerarTodasCartelas() {
             botao.style.opacity = '1';
         }
     });
-    
-    // MOSTRAR BASE DE DADOS DAS CARTELAS
-    console.log('📊 BASE DE DADOS DAS CARTELAS CRIADA:');
-    console.log(window.cartelasDatabase);
-    
-    // SALVAR NO LOCALSTORAGE PARA USAR NO SORTEIO
-    localStorage.setItem('cartelasDatabase', JSON.stringify(window.cartelasDatabase));
-    
-    console.log('Processo de geração completado! Botões habilitados.');
-    console.log('💾 Dados salvos no localStorage para uso no sorteio.');
 }
 
 // Event Listeners
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🎲 Script carregado!');
-    
     const botaoGerar = document.getElementById('gerarCartelas');
     const botaoNovas = document.getElementById('novasCartelas');
     

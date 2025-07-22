@@ -631,24 +631,13 @@
 
         function validarCartela(dadosQR) {
             try {
-                console.log('🔍 Validando cartela:', dadosQR);
+                // QR code é uma string simples: "A1,B2,C3,..."
+                const chaves = dadosQR.split(',');
                 
-                // EXTRAIR AS CHAVES DO QR CODE
-                const chavesCartela = JSON.parse(dadosQR);
+                // Converter chaves para palavras
+                const itensCartela = chaves.map(chave => itensMap[chave]).filter(item => item);
                 
-                // VERIFICAR SE É UM ARRAY DE CHAVES
-                if (!Array.isArray(chavesCartela) || chavesCartela.length === 0) {
-                    throw new Error('QR Code não contém lista de chaves válida');
-                }
-
-                console.log(`🔑 Chaves da cartela: ${chavesCartela.join(', ')}`);
-
-                // CONVERTER CHAVES PARA PALAVRAS
-                const itensCartela = chavesCartela.map(chave => itensMap[chave]).filter(item => item);
-                
-                console.log(`📝 Palavras da cartela: ${itensCartela.join(', ')}`);
-
-                // VERIFICAR QUAIS PALAVRAS DA CARTELA AINDA NÃO FORAM SORTEADAS
+                // Verificar quais palavras ainda não foram sorteadas
                 const palavrasFaltando = itensCartela.filter(palavra => !itensSorteados.includes(palavra));
                 const isBingo = palavrasFaltando.length === 0;
 
@@ -672,11 +661,7 @@
                     }
                 }
 
-                console.log(`✅ Validação: ${isBingo ? 'BINGO!' : `Faltam ${palavrasFaltando.length} palavras: ${palavrasFaltando.join(', ')}`}`);
-
             } catch (error) {
-                console.error('❌ Erro na validação:', error);
-                
                 const resultadoDiv = document.getElementById('resultadoValidacao');
                 if (resultadoDiv) {
                     resultadoDiv.style.display = 'block';
