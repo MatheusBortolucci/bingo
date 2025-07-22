@@ -52,14 +52,13 @@ function gerarCartela(numeroCartela) {
     cartela.className = 'cartela';
     
     // Gerar dados completos para QR Code incluindo os itens da cartela
-    const timestamp = Date.now();
-    const dadosQR = JSON.stringify({
+    const dadosQR = {
         numero: numeroCartela,
+        evento: 'Chá de Panela da Mari',
+        timestamp: new Date().toISOString(),
         itens: itensCartela,
-        evento: "Cha-de-Panela-Mari",
-        timestamp: timestamp,
         hash: gerarHashCartela(numeroCartela, itensCartela)
-    });
+    };
     
     console.log(`📦 Dados QR Code para cartela ${numeroCartela}:`, JSON.parse(dadosQR));
     
@@ -83,7 +82,7 @@ function gerarCartela(numeroCartela) {
     
     // Gerar QR Code após adicionar ao DOM
     setTimeout(() => {
-        gerarQRCodeMini(numeroCartela, dadosQR);
+        gerarQRCodeMini(numeroCartela, JSON.stringify(dadosQR));
     }, 500);
     
     console.log(`Cartela ${numeroCartela} criada com sucesso`);
