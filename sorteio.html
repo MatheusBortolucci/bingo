@@ -343,6 +343,11 @@
                             <button onclick="validarCartelaComWebRTC()" class="btn" style="background: linear-gradient(135deg, #4caf50, #66bb6a); padding: 15px 30px; font-size: 16px; font-weight: bold; width: 100%; margin: 10px 0;">
                                 🎯 Validar Cartela
                             </button>
+                            
+                            <!-- Botão de teste para debug -->
+                            <button onclick="gerarQRCodeTeste()" class="btn" style="background: linear-gradient(135deg, #ff9800, #ffb74d); padding: 10px 20px; font-size: 14px; width: 100%; margin: 5px 0;">
+                                🧪 Gerar QR de Teste
+                            </button>
                         </div>
                         
                         <input type="file" id="qrInput" accept="image/*" style="display: none;">
@@ -1287,6 +1292,62 @@
         
         // ==================== SCANNER ESPECIAL IPHONE ====================
         
+        // Função para gerar QR Code de teste
+        function gerarQRCodeTeste() {
+            console.log('🧪 Gerando QR Code de teste...');
+            
+            // Dados de teste simulando uma cartela
+            const dadosTeste = {
+                numero: 999,
+                evento: 'Chá de Panela da Mari',
+                timestamp: new Date().toISOString(),
+                itens: ['Panela', 'Colher', 'Garfo', 'Faca'] // Itens de teste
+            };
+            
+            const jsonTeste = JSON.stringify(dadosTeste);
+            
+            // Criar QR Code
+            const qrContainer = document.createElement('div');
+            qrContainer.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: white;
+                padding: 20px;
+                border-radius: 10px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+                z-index: 1000;
+                text-align: center;
+            `;
+            
+            qrContainer.innerHTML = `
+                <h3>🧪 QR Code de Teste</h3>
+                <div id="qrTeste" style="margin: 15px 0;"></div>
+                <p style="font-size: 12px; color: #666;">Use este QR para testar o scanner</p>
+                <button onclick="this.parentElement.remove()" style="background: #f44336; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+                    ❌ Fechar
+                </button>
+            `;
+            
+            document.body.appendChild(qrContainer);
+            
+            // Gerar QR Code usando a biblioteca
+            if (typeof QRCode !== 'undefined') {
+                new QRCode(document.getElementById('qrTeste'), {
+                    text: jsonTeste,
+                    width: 200,
+                    height: 200,
+                    colorDark: '#000000',
+                    colorLight: '#ffffff'
+                });
+            } else {
+                document.getElementById('qrTeste').innerHTML = '<p>QRCode.js não carregado</p>';
+            }
+            
+            mostrarFeedback('🧪 QR Code de teste gerado! Use o scanner para testá-lo.', 'info');
+        }
+        
         // Função específica para iPhone - evita transmissão ao vivo
         function abrirCameraFotoUnica() {
             console.log('📷 Abrindo câmera para foto única (iPhone)...');
@@ -1322,6 +1383,14 @@
             console.log('🎯 Iniciando validação de cartela...');
             mostrarFeedback('🎯 Preparando scanner WebRTC otimizado...', 'info');
             
+            // Verificar se jsQR está disponível
+            if (typeof jsQR === 'undefined') {
+                console.error('❌ jsQR não está carregado!');
+                mostrarFeedback('❌ Biblioteca jsQR não carregada - recarregue a página', 'error');
+                return;
+            }
+            console.log('✅ jsQR disponível:', typeof jsQR);
+            
             try {
                 // Configurações WebRTC otimizadas para evitar modo transmissão
                 const constraints = {
@@ -1339,7 +1408,9 @@
                     audio: false // Sem áudio para evitar problemas
                 };
                 
+                console.log('📹 Solicitando acesso à câmera...');
                 const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                console.log('✅ Stream de câmera obtido');
                 iniciarScannerWebRTCOtimizado(stream);
                 
             } catch (error) {
@@ -1354,6 +1425,7 @@
         
         // Scanner WebRTC otimizado
         function iniciarScannerWebRTCOtimizado(stream) {
+            console.log('🚀 Iniciando scanner WebRTC otimizado...');
             const video = document.getElementById('cameraVideo');
             const canvas = document.getElementById('qrCanvas');
             const context = canvas.getContext('2d');
@@ -1373,35 +1445,53 @@
                 canvas.height = video.videoHeight;
                 video.play();
                 
+                console.log(`📐 Vídeo configurado: ${video.videoWidth}x${video.videoHeight}`);
                 mostrarFeedback('📹 Scanner ativo - posicione o QR Code na tela', 'success');
+                
+                let scanCount = 0;
                 
                 // Scanner loop otimizado
                 const scanInterval = setInterval(() => {
                     if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                        scanCount++;
+                        
+                        // Log a cada 10 tentativas
+                        if (scanCount % 10 === 0) {
+                            console.log(`🔍 Tentativa de scan #${scanCount}`);
+                        }
+                        
                         context.drawImage(video, 0, 0, canvas.width, canvas.height);
                         const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
                         
-                        // Tentar ler QR Code
-                        const code = jsQR(imageData.data, imageData.width, imageData.height);
-                        
-                        if (code) {
-                            console.log('✅ QR Code detectado!', code.data);
+                        // Tentar ler QR Code com jsQR
+                        try {
+                            const code = jsQR(imageData.data, imageData.width, imageData.height, {
+                                inversionAttempts: "dontInvert", // Melhor performance
+                            });
                             
-                            // Parar scanner e fechar câmera AUTOMATICAMENTE
-                            clearInterval(scanInterval);
-                            pararCamera(stream);
-                            
-                            // Mostrar feedback de sucesso
-                            mostrarFeedback('✅ QR Code lido - câmera fechada automaticamente!', 'success');
-                            
-                            // Processar resultado
-                            processarQRCode(code.data);
+                            if (code) {
+                                console.log('✅ QR Code detectado!', code.data);
+                                
+                                // Parar scanner e fechar câmera AUTOMATICAMENTE
+                                clearInterval(scanInterval);
+                                pararCamera(stream);
+                                
+                                // Mostrar feedback de sucesso
+                                mostrarFeedback('✅ QR Code lido - câmera fechada automaticamente!', 'success');
+                                
+                                // Processar resultado
+                                processarQRCodeDetectado(code.data, '✅ QR lido via WebRTC!');
+                                return;
+                            }
+                        } catch (jsQRError) {
+                            console.error('❌ Erro no jsQR:', jsQRError);
                         }
                     }
-                }, 300); // Scanner a cada 300ms (otimizado)
+                }, 200); // Scanner mais frequente: a cada 200ms
                 
                 // Timeout para evitar uso excessivo da câmera - fecha automaticamente
                 setTimeout(() => {
+                    console.log('⏱️ Timeout do scanner após 30 segundos');
                     clearInterval(scanInterval);
                     pararCamera(stream);
                     mostrarFeedback('⏱️ Tempo esgotado - câmera fechada automaticamente', 'warning');
