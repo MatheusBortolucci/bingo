@@ -51,15 +51,17 @@ function gerarCartela(numeroCartela) {
     const cartela = document.createElement('div');
     cartela.className = 'cartela';
     
-    // Gerar dados melhorados para QR Code
+    // Gerar dados completos para QR Code incluindo os itens da cartela
     const timestamp = Date.now();
     const dadosQR = JSON.stringify({
-        cartela: numeroCartela,
+        numero: numeroCartela,
+        itens: itensCartela,
         evento: "Cha-de-Panela-Mari",
-        data: new Date().toLocaleDateString('pt-BR'),
-        hash: `${numeroCartela}-${timestamp.toString().slice(-6)}`,
-        validacao: true
+        timestamp: timestamp,
+        hash: gerarHashCartela(numeroCartela, itensCartela)
     });
+    
+    console.log(`📦 Dados QR Code para cartela ${numeroCartela}:`, JSON.parse(dadosQR));
     
     cartela.innerHTML = `
         <div class="cartela-numero">Cartela ${numeroCartela}</div>
