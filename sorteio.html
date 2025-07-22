@@ -345,6 +345,7 @@
                         <div id="botoesScanner">
                             <button id="iniciarCamera" class="btn" style="background: linear-gradient(135deg, #4caf50, #66bb6a);">📹 Escanear com Câmera</button>
                             <button id="uploadQR" class="btn" style="background: linear-gradient(135deg, #2196f3, #64b5f6); margin-left: 10px;">📁 Carregar Imagem</button>
+                            <button onclick="debugBotaoCamera()" class="btn" style="background: linear-gradient(135deg, #ff9800, #ffb74d); margin-left: 10px;">🔍 Debug</button>
                         </div>
                         
                         <input type="file" id="qrInput" accept="image/*" style="display: none;">
@@ -364,7 +365,12 @@
     </div>
 
     <!-- Bibliotecas necessárias -->
-    <script src="https://unpkg.com/jsqr@1.4.0/dist/jsQR.js"></script>
+        <!-- Scripts necessários -->
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+    <!-- QuaggaJS para melhor leitura de códigos -->
+    <script src="https://cdn.jsdelivr.net/npm/quagga@0.12.1/dist/quagga.min.js"></script>
+    <!-- Instascan como alternativa moderna -->
+    <script src="https://cdn.jsdelivr.net/npm/instascan@1.0.0/instascan.min.js"></script>
     
     <script>
         // Itens da cozinha (mesmo array do script principal)
@@ -700,6 +706,198 @@
         let scannerInterval = null;
         let barcodeDetector = null;
 
+        // Debug: função para testar disponibilidade de tecnologias
+        function debugBotaoCamera() {
+            console.log('🔍 DEBUG: Testando tecnologias disponíveis...');
+            
+            const tecnologias = {
+                'Navigator.mediaDevices': !!navigator.mediaDevices,
+                'getUserMedia': !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia),
+                'BarcodeDetector': 'BarcodeDetector' in window,
+                'jsQR': typeof jsQR !== 'undefined',
+                'Instascan': typeof Instascan !== 'undefined',
+                'Quagga': typeof Quagga !== 'undefined'
+            };
+            
+            console.table(tecnologias);
+            
+            let mensagem = '🔍 Tecnologias: ';
+            Object.entries(tecnologias).forEach(([tech, available]) => {
+                mensagem += `${tech}: ${available ? '✅' : '❌'} `;
+            });
+            
+            mostrarFeedback(mensagem, 'info');
+        }
+
+        // Função principal melhorada que tenta múltiplas abordagens
+        async function testarCameraSimplesmente() {
+            console.log('� Iniciando detecção QR com múltiplas tecnologias...');
+            mostrarFeedback('� Escolhendo melhor método de scanner...', 'info');
+            
+            // 1. Tentar Instascan primeiro (melhor para QR)
+            if (typeof Instascan !== 'undefined') {
+                console.log('📸 Tentando Instascan (método preferido)...');
+                iniciarScannerInstascan();
+                return;
+            }
+            
+            // 2. Fallback para método tradicional
+            console.log('� Instascan não disponível, usando método tradicional...');
+            iniciarScannerTradicional();
+        }
+
+        // Função moderna usando Instascan (específica para QR)
+        async function iniciarScannerInstascan() {
+            console.log('� Tentando Instascan para QR Code...');
+            mostrarFeedback('� Iniciando scanner QR moderno...', 'info');
+            
+            try {
+                // Verificar se Instascan está disponível
+                if (typeof Instascan === 'undefined') {
+                    throw new Error('Instascan não carregado, usando método alternativo');
+                }
+                
+                const video = document.getElementById('cameraVideo');
+                const cameraContainer = document.getElementById('cameraContainer');
+                const botoesScanner = document.getElementById('botoesScanner');
+                
+                // Criar scanner Instascan
+                const scanner = new Instascan.Scanner({ 
+                    video: video,
+                    scanPeriod: 5, // Scan a cada 5ms para melhor responsividade
+                    mirror: false // Não espelhar para câmera traseira
+                });
+                
+                // Evento quando QR Code é detectado
+                scanner.addListener('scan', function (content) {
+                    console.log('🎯 QR detectado via Instascan:', content);
+                    
+                    // Parar scanner
+                    scanner.stop();
+                    cameraContainer.style.display = 'none';
+                    botoesScanner.style.display = 'block';
+                    
+                    // Processar QR Code
+                    document.getElementById('qrText').value = content;
+                    validarCartela(content);
+                    
+                    mostrarFeedback('✅ QR lido com Instascan!', 'success');
+                    
+                    // Vibração
+                    if ('vibrate' in navigator) {
+                        navigator.vibrate([200, 100, 200]);
+                    }
+                });
+                
+                // Obter câmeras disponíveis
+                const cameras = await Instascan.Camera.getCameras();
+                console.log('📷 Câmeras encontradas:', cameras.length);
+                
+                if (cameras.length > 0) {
+                    // Preferir câmera traseira (environment)
+                    let selectedCamera = cameras[0];
+                    
+                    for (const camera of cameras) {
+                        if (camera.name.toLowerCase().includes('back') || 
+                            camera.name.toLowerCase().includes('rear') ||
+                            camera.name.toLowerCase().includes('environment')) {
+                            selectedCamera = camera;
+                            break;
+                        }
+                    }
+                    
+                    console.log('📱 Usando câmera:', selectedCamera.name);
+                    
+                    // Mostrar vídeo e iniciar scanner
+                    cameraContainer.style.display = 'block';
+                    botoesScanner.style.display = 'none';
+                    
+                    scanner.start(selectedCamera);
+                    mostrarFeedback('📱 Scanner Instascan ativo! Foque no QR Code', 'success');
+                    
+                } else {
+                    throw new Error('Nenhuma câmera encontrada');
+                }
+                
+            } catch (error) {
+                console.log('⚠️ Instascan falhou, tentando método tradicional:', error.message);
+                // Fallback para o método anterior
+                iniciarScannerTradicional();
+            }
+        }
+
+        // Método tradicional como fallback
+        async function iniciarScannerTradicional() {
+            console.log('� Usando método tradicional getUserMedia + jsQR...');
+            mostrarFeedback('📹 Scanner tradicional...', 'info');
+            
+            const video = document.getElementById('cameraVideo');
+            const canvas = document.getElementById('qrCanvas');
+            const context = canvas.getContext('2d');
+            const cameraContainer = document.getElementById('cameraContainer');
+            const botoesScanner = document.getElementById('botoesScanner');
+            
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: { 
+                        facingMode: { ideal: 'environment' },
+                        width: { ideal: 640 },
+                        height: { ideal: 480 }
+                    }
+                });
+                
+                video.srcObject = stream;
+                await video.play();
+                
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                
+                cameraContainer.style.display = 'block';
+                botoesScanner.style.display = 'none';
+                scannerAtivo = true;
+                
+                mostrarFeedback('📱 Scanner jsQR ativo!', 'success');
+                
+                // Loop de detecção
+                scannerInterval = setInterval(() => {
+                    if (!scannerAtivo) return;
+                    
+                    try {
+                        context.drawImage(video, 0, 0);
+                        const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+                        
+                        if (typeof jsQR !== 'undefined') {
+                            const code = jsQR(imageData.data, imageData.width, imageData.height);
+                            
+                            if (code) {
+                                console.log('📚 QR detectado via jsQR:', code.data);
+                                
+                                // Parar
+                                clearInterval(scannerInterval);
+                                scannerAtivo = false;
+                                stream.getTracks().forEach(track => track.stop());
+                                
+                                cameraContainer.style.display = 'none';
+                                botoesScanner.style.display = 'block';
+                                
+                                // Processar
+                                document.getElementById('qrText').value = code.data;
+                                validarCartela(code.data);
+                                
+                                mostrarFeedback('✅ QR lido com jsQR!', 'success');
+                            }
+                        }
+                    } catch (err) {
+                        console.error('Erro na detecção:', err);
+                    }
+                }, 150);
+                
+            } catch (error) {
+                console.error('❌ Erro no scanner tradicional:', error);
+                mostrarFeedback(`❌ Erro na câmera: ${error.message}`, 'error');
+            }
+        }
+
         // Função para detectar capacidades do dispositivo
         function detectarCapacidadesScanner() {
             const capacidades = {
@@ -940,27 +1138,47 @@
             }
         }
 
-        // Função para parar o scanner
+        // Função para parar o scanner - versão melhorada
         function pararScanner() {
+            console.log('🛑 Parando todos os scanners...');
             scannerAtivo = false;
             
+            // Parar intervalo jsQR
             if (scannerInterval) {
                 clearInterval(scannerInterval);
                 scannerInterval = null;
             }
             
+            // Parar streams de vídeo
             if (videoStream) {
                 videoStream.getTracks().forEach(track => track.stop());
                 videoStream = null;
             }
+            
+            // Parar Instascan se existir
+            try {
+                if (typeof Instascan !== 'undefined' && window.instascanScanner) {
+                    window.instascanScanner.stop();
+                    window.instascanScanner = null;
+                }
+            } catch (e) {
+                console.log('Instascan já parado');
+            }
 
+            // Parar vídeo
             const video = document.getElementById('cameraVideo');
             const cameraContainer = document.getElementById('cameraContainer');
             const botoesScanner = document.getElementById('botoesScanner');
 
-            video.srcObject = null;
-            cameraContainer.style.display = 'none';
-            botoesScanner.style.display = 'block';
+            if (video) {
+                video.srcObject = null;
+                video.pause();
+            }
+            
+            if (cameraContainer) cameraContainer.style.display = 'none';
+            if (botoesScanner) botoesScanner.style.display = 'block';
+            
+            mostrarFeedback('🛑 Scanner parado', 'info');
         }
 
         // Função para mostrar feedback visual
@@ -1006,8 +1224,8 @@
             document.getElementById('sortearItem').addEventListener('click', sortearItem);
             document.getElementById('reiniciarSorteio').addEventListener('click', reiniciarSorteio);
             
-            // Event listeners para o scanner de câmera
-            document.getElementById('iniciarCamera').addEventListener('click', iniciarScanner);
+            // Event listeners para o scanner de câmera - VERSÃO SIMPLIFICADA
+            document.getElementById('iniciarCamera').addEventListener('click', testarCameraSimplesmente);
             document.getElementById('pararCamera').addEventListener('click', pararScanner);
             
             document.getElementById('uploadQR').addEventListener('click', () => {
