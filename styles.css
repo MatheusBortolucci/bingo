@@ -774,4 +774,62 @@ header h2 {
     .cartela-header {
         height: 65px;
     }
+
+    /* QR Code específico para mobile */
+    .qr-center {
+        position: relative;
+        background: white !important;
+        border: 2px solid #e91e63 !important;
+    }
+    
+    .qr-center::before {
+        content: "📱";
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        font-size: 8px;
+        z-index: 1;
+        background: rgba(255,255,255,0.8);
+        border-radius: 2px;
+        padding: 1px;
+    }
+    
+    .qr-code-mini {
+        min-height: 50px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        position: relative;
+    }
+    
+    .qr-code-mini canvas {
+        width: 100% !important;
+        height: 100% !important;
+        max-width: 50px !important;
+        max-height: 50px !important;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+    }
+    
+    .qr-code-mini img {
+        width: 100% !important;
+        height: 100% !important;
+        max-width: 50px !important;
+        max-height: 50px !important;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+    }
+}
+
+/* Media query específica para telas muito pequenas */
+@media (max-width: 480px) {
+    .qr-code-mini {
+        min-height: 45px !important;
+    }
+    
+    .qr-code-mini canvas,
+    .qr-code-mini img {
+        max-width: 45px !important;
+        max-height: 45px !important;
+    }
 }
