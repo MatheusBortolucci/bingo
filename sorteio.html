@@ -336,16 +336,13 @@
                         <div id="cameraContainer" style="display: none;">
                             <video id="cameraVideo" style="width: 100%; max-width: 400px; border: 2px solid #e91e63; border-radius: 10px;"></video>
                             <canvas id="qrCanvas" style="display: none;"></canvas>
-                            <div style="margin-top: 10px;">
-                                <button id="pararCamera" class="btn" style="background: linear-gradient(135deg, #f44336, #ef5350);">❌ Parar Câmera</button>
-                            </div>
                         </div>
                         
-                        <!-- Botões de ação -->
+                        <!-- Botão único de validação -->
                         <div id="botoesScanner">
-                            <button id="iniciarCamera" class="btn" style="background: linear-gradient(135deg, #4caf50, #66bb6a);">📹 Escanear com Câmera</button>
-                            <button id="uploadQR" class="btn" style="background: linear-gradient(135deg, #2196f3, #64b5f6); margin-left: 10px;">📁 Carregar Imagem</button>
-                            <button onclick="debugBotaoCamera()" class="btn" style="background: linear-gradient(135deg, #ff9800, #ffb74d); margin-left: 10px;">🔍 Debug</button>
+                            <button onclick="validarCartelaComWebRTC()" class="btn" style="background: linear-gradient(135deg, #4caf50, #66bb6a); padding: 15px 30px; font-size: 16px; font-weight: bold; width: 100%; margin: 10px 0;">
+                                🎯 Validar Cartela
+                            </button>
                         </div>
                         
                         <input type="file" id="qrInput" accept="image/*" style="display: none;">
@@ -1320,69 +1317,120 @@
             input.click();
         }
         
-        // Função melhorada para detectar iPhone e mostrar opções específicas
-        function modificarTesteParaIPhone() {
-            const isIPhone = /iPhone|iPad|iPod/.test(navigator.userAgent);
+        // Função única para validar cartela com WebRTC otimizado
+        async function validarCartelaComWebRTC() {
+            console.log('🎯 Iniciando validação de cartela...');
+            mostrarFeedback('🎯 Preparando scanner WebRTC otimizado...', 'info');
             
-            // Interceptar função original apenas no iPhone
-            if (isIPhone) {
-                const originalTeste = testarCameraSimplesmente;
+            try {
+                // Configurações WebRTC otimizadas para evitar modo transmissão
+                const constraints = {
+                    video: {
+                        facingMode: 'environment', // Câmera traseira
+                        width: { ideal: 1280, max: 1920 },
+                        height: { ideal: 720, max: 1080 },
+                        frameRate: { ideal: 15, max: 30 }, // FPS reduzido
+                        focusMode: 'continuous',
+                        exposureMode: 'continuous',
+                        // Configurações específicas para iOS
+                        aspectRatio: 16/9,
+                        resizeMode: 'crop-and-scale'
+                    },
+                    audio: false // Sem áudio para evitar problemas
+                };
                 
-                testarCameraSimplesmente = function() {
-                    console.log('📱 iPhone detectado - evitando transmissão ao vivo');
-                    mostrarFeedback('📱 iPhone: Usando método sem transmissão', 'info');
-                    
-                    // Mostrar opções específicas para iPhone
-                    const botoesScanner = document.getElementById('botoesScanner');
-                    botoesScanner.innerHTML = `
-                        <div style="background: #fff3cd; border: 2px solid #ffc107; border-radius: 10px; padding: 15px; text-align: center; margin: 10px 0;">
-                            <h4 style="color: #856404;">📱 Scanner iPhone</h4>
-                            <p style="color: #856404; font-size: 14px;">Método sem transmissão ao vivo:</p>
-                            
-                            <button onclick="abrirCameraFotoUnica()" class="btn" style="background: linear-gradient(135deg, #28a745, #34ce57); margin: 10px 0; width: 100%; padding: 15px; font-size: 16px; font-weight: bold;">
-                                📷 Tirar Foto do QR Code
-                            </button>
-                            
-                            <button onclick="document.getElementById('qrInput').click()" class="btn" style="background: linear-gradient(135deg, #007bff, #0056b3); margin: 5px 0; width: 100%; padding: 12px;">
-                                📁 Escolher da Galeria
-                            </button>
-                            
-                            <button onclick="location.reload()" class="btn" style="background: linear-gradient(135deg, #6c757d, #545b62); margin: 5px 0; width: 100%; padding: 10px;">
-                                🔄 Tentar Outro Método
-                            </button>
-                            
-                            <p style="color: #856404; font-size: 12px; margin-top: 10px;">
-                                💡 "Tirar Foto" não ativa transmissão contínua
-                            </p>
-                        </div>
-                    `;
-                }
+                const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                iniciarScannerWebRTCOtimizado(stream);
+                
+            } catch (error) {
+                console.error('❌ Erro ao acessar câmera:', error);
+                mostrarFeedback('❌ Erro ao acessar câmera: ' + error.message, 'error');
+                
+                // Fallback para entrada de arquivo
+                mostrarFeedback('� Tentando método alternativo...', 'info');
+                document.getElementById('qrInput').click();
             }
         }
         
-        // Executar modificação ao carregar a página
+        // Scanner WebRTC otimizado
+        function iniciarScannerWebRTCOtimizado(stream) {
+            const video = document.getElementById('cameraVideo');
+            const canvas = document.getElementById('qrCanvas');
+            const context = canvas.getContext('2d');
+            
+            // Mostrar container da câmera
+            document.getElementById('cameraContainer').style.display = 'block';
+            document.getElementById('botoesScanner').style.display = 'none';
+            
+            // Configurar vídeo
+            video.srcObject = stream;
+            video.setAttribute('playsinline', true);
+            video.setAttribute('webkit-playsinline', true);
+            video.setAttribute('muted', true);
+            
+            video.onloadedmetadata = function() {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                video.play();
+                
+                mostrarFeedback('📹 Scanner ativo - posicione o QR Code na tela', 'success');
+                
+                // Scanner loop otimizado
+                const scanInterval = setInterval(() => {
+                    if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                        const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+                        
+                        // Tentar ler QR Code
+                        const code = jsQR(imageData.data, imageData.width, imageData.height);
+                        
+                        if (code) {
+                            console.log('✅ QR Code detectado!', code.data);
+                            
+                            // Parar scanner e fechar câmera AUTOMATICAMENTE
+                            clearInterval(scanInterval);
+                            pararCamera(stream);
+                            
+                            // Mostrar feedback de sucesso
+                            mostrarFeedback('✅ QR Code lido - câmera fechada automaticamente!', 'success');
+                            
+                            // Processar resultado
+                            processarQRCode(code.data);
+                        }
+                    }
+                }, 300); // Scanner a cada 300ms (otimizado)
+                
+                // Timeout para evitar uso excessivo da câmera - fecha automaticamente
+                setTimeout(() => {
+                    clearInterval(scanInterval);
+                    pararCamera(stream);
+                    mostrarFeedback('⏱️ Tempo esgotado - câmera fechada automaticamente', 'warning');
+                }, 30000); // 30 segundos máximo
+            };
+        }
+        
+        // Parar câmera completamente
+        function pararCamera(stream) {
+            if (stream) {
+                stream.getTracks().forEach(track => {
+                    track.stop();
+                });
+            }
+            const video = document.getElementById('cameraVideo');
+            if (video.srcObject) {
+                video.srcObject = null;
+            }
+            
+            // Ocultar interface da câmera
+            document.getElementById('cameraContainer').style.display = 'none';
+            document.getElementById('botoesScanner').style.display = 'block';
+        }
+        
+        // Executar ao carregar a página
         document.addEventListener('DOMContentLoaded', function() {
-            modificarTesteParaIPhone();
+            carregarEstadoSorteio();
         });
 
     </script>
-</body>
-</html>
-        <div class="progresso-container">
-            <div class="progresso-label">Progresso do Sorteio</div>
-            <div class="progresso-bar">
-                <div id="progressoFill" class="progresso-fill"></div>
-            </div>
-            <div class="progresso-texto">
-                <span id="progressoTexto">0% concluído</span>
-            </div>
-        </div>
-    </main>
-
-    <footer>
-        <p>💕 Feito com amor para o Chá de Panela da Mari</p>
-    </footer>
-
-    <script src="sorteio.js"></script>
 </body>
 </html>
