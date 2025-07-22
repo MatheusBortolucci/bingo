@@ -276,50 +276,97 @@
     <script>
         console.log('🚀 Carregando sistema de sorteio...');
         
-        // MAPEAMENTO CHAVE-VALOR DOS ITENS (idêntico ao script-novo.js)
-        const itensMap = {
-            // Talheres Básicos (A1-A6)
-            "A1": "Garfo", "A2": "Faca", "A3": "Colher", "A4": "Colher de chá", "A5": "Faca de pão", "A6": "Garfo de sobremesa",
-            
-            // Panelas e Frigideiras (B1-B6)
-            "B1": "Panela de pressão", "B2": "Panela", "B3": "Frigideira", "B4": "Caçarola", "B5": "Leiteira", "B6": "Chaleira",
-            
-            // Utensílios Básicos de Cozinha (C1-C15)
-            "C1": "Concha", "C2": "Escumadeira", "C3": "Espátula", "C4": "Colher de pau", "C5": "Batedor de ovos", "C6": "Pegador",
-            "C7": "Abridor de latas", "C8": "Saca-rolhas", "C9": "Descascador", "C10": "Ralador", "C11": "Peneira", "C12": "Coador",
-            "C13": "Tábua de corte", "C14": "Rolo de massa", "C15": "Funil",
-            
-            // Assadeiras e Formas (D1-D5)
-            "D1": "Assadeira", "D2": "Forma de bolo", "D3": "Forma de pizza", "D4": "Forma de pão", "D5": "Refratário",
-            
-            // Eletrodomésticos Comuns (E1-E6)
-            "E1": "Liquidificador", "E2": "Batedeira", "E3": "Torradeira", "E4": "Cafeteira", "E5": "Micro-ondas", "E6": "Mixer",
-            
-            // Recipientes e Potes (F1-F5)
-            "F1": "Tigela", "F2": "Jarra", "F3": "Potes", "F4": "Tupperware", "F5": "Garrafa térmica",
-            
-            // Itens para Servir (G1-G7)
-            "G1": "Pratos", "G2": "Xícaras", "G3": "Copos", "G4": "Canecas", "G5": "Travessa", "G6": "Açucareiro", "G7": "Bule",
-            
-            // Utensílios de Medição (H1-H3)
-            "H1": "Balança", "H2": "Xícaras medidoras", "H3": "Timer",
-            
-            // Itens Diversos (I1-I10)
-            "I1": "Avental", "I2": "Luvas de forno", "I3": "Panos de prato", "I4": "Escorredor de louças", "I5": "Porta-talheres",
-            "I6": "Descanso de panela", "I7": "Guardanapos", "I8": "Papel toalha", "I9": "Papel alumínio", "I10": "Filme plástico"
-        };
 
-        // Array de itens do bingo (derivado do mapeamento)
-        const itensBingo = Object.values(itensMap);
+// Array padronizado igual ao script.js
+const itensCozinha = [
+    { chave: 1, nome: "Garfo" },
+    { chave: 2, nome: "Faca" },
+    { chave: 3, nome: "Colher" },
+    { chave: 4, nome: "Colher de chá" },
+    { chave: 5, nome: "Faca de pão" },
+    { chave: 6, nome: "Garfo de sobremesa" },
+    { chave: 7, nome: "Panela de pressão" },
+    { chave: 8, nome: "Panela" },
+    { chave: 9, nome: "Frigideira" },
+    { chave: 10, nome: "Caçarola" },
+    { chave: 11, nome: "Leiteira" },
+    { chave: 12, nome: "Chaleira" },
+    { chave: 13, nome: "Concha" },
+    { chave: 14, nome: "Escumadeira" },
+    { chave: 15, nome: "Espátula" },
+    { chave: 16, nome: "Colher de pau" },
+    { chave: 17, nome: "Batedor de ovos" },
+    { chave: 18, nome: "Pegador" },
+    { chave: 19, nome: "Abridor de latas" },
+    { chave: 20, nome: "Saca-rolhas" },
+    { chave: 21, nome: "Descascador" },
+    { chave: 22, nome: "Ralador" },
+    { chave: 23, nome: "Peneira" },
+    { chave: 24, nome: "Coador" },
+    { chave: 25, nome: "Tábua de corte" },
+    { chave: 26, nome: "Rolo de massa" },
+    { chave: 27, nome: "Funil" },
+    { chave: 28, nome: "Assadeira" },
+    { chave: 29, nome: "Forma de bolo" },
+    { chave: 30, nome: "Forma de pizza" },
+    { chave: 31, nome: "Forma de pão" },
+    { chave: 32, nome: "Refratário" },
+    { chave: 33, nome: "Liquidificador" },
+    { chave: 34, nome: "Batedeira" },
+    { chave: 35, nome: "Torradeira" },
+    { chave: 36, nome: "Cafeteira" },
+    { chave: 37, nome: "Micro-ondas" },
+    { chave: 38, nome: "Mixer" },
+    { chave: 39, nome: "Tigela" },
+    { chave: 40, nome: "Jarra" },
+    { chave: 41, nome: "Potes" },
+    { chave: 42, nome: "Tupperware" },
+    { chave: 43, nome: "Garrafa térmica" },
+    { chave: 44, nome: "Pratos" },
+    { chave: 45, nome: "Xícaras" },
+    { chave: 46, nome: "Copos" },
+    { chave: 47, nome: "Canecas" },
+    { chave: 48, nome: "Travessa" },
+    { chave: 49, nome: "Açucareiro" },
+    { chave: 50, nome: "Bule" },
+    { chave: 51, nome: "Balança" },
+    { chave: 52, nome: "Xícaras medidoras" },
+    { chave: 53, nome: "Timer" },
+    { chave: 54, nome: "Avental" },
+    { chave: 55, nome: "Luvas de forno" },
+    { chave: 56, nome: "Panos de prato" },
+    { chave: 57, nome: "Escorredor de louças" },
+    { chave: 58, nome: "Porta-talheres" },
+    { chave: 59, nome: "Descanso de panela" },
+    { chave: 60, nome: "Guardanapos" },
+    { chave: 61, nome: "Papel toalha" },
+    { chave: 62, nome: "Papel alumínio" },
+    { chave: 63, nome: "Filme plástico" }
+];
 
-        // Estado do jogo
-        let itensSorteados = [];
-        let itensDisponiveis = [...itensBingo];
+// Função para obter nome pelo chave
+function obterItemDaChave(chave) {
+    const obj = itensCozinha.find(item => item.chave === Number(chave));
+    return obj ? obj.nome : null;
+}
 
-        // Estado do scanner
-        let stream = null;
-        let scanning = false;
-        let scannerInterval = null;
+// Função para obter chave pelo nome
+function obterChaveItem(nome) {
+    const obj = itensCozinha.find(item => item.nome === nome);
+    return obj ? obj.chave : null;
+}
+
+// Deriva o array de nomes para o bingo
+const itensBingo = itensCozinha.map(item => item.nome);
+
+// Estado do jogo
+let itensSorteados = [];
+let itensDisponiveis = [...itensBingo];
+
+// Estado do scanner
+let stream = null;
+let scanning = false;
+let scannerInterval = null;
 
         // Aguardar carregamento da página
         if (document.readyState === 'loading') {
@@ -631,11 +678,11 @@
 
         function validarCartela(dadosQR) {
             try {
-                // QR code é uma string simples: "A1,B2,C3,..."
-                const chaves = dadosQR.split(',');
+                // QR code é uma string simples com chaves numéricas: "1,2,3,4,5..."
+                const chavesNumericas = dadosQR.split(',').map(chave => parseInt(chave.trim())).filter(chave => !isNaN(chave));
                 
-                // Converter chaves para palavras
-                const itensCartela = chaves.map(chave => itensMap[chave]).filter(item => item);
+                // Converter chaves numéricas para palavras
+                const itensCartela = chavesNumericas.map(chave => obterItemDaChave(chave)).filter(item => item);
                 
                 // Verificar quais palavras ainda não foram sorteadas
                 const palavrasFaltando = itensCartela.filter(palavra => !itensSorteados.includes(palavra));

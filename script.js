@@ -1,35 +1,88 @@
-
+// Função para validar se uma chave sorteada está presente na cartela
+// qrString: string do QR Code (ex: "12,5,33,7,...")
+// chaveSorteada: número da chave sorteada
+function validarSorteioCartela(qrString, chaveSorteada) {
+    if (!qrString || typeof qrString !== 'string') return false;
+    const chaves = qrString.split(',').map(str => parseInt(str.trim(), 10));
+    return chaves.includes(Number(chaveSorteada));
+}
 const itensCozinha = [
-    // Talheres Básicos
-    "Garfo", "Faca", "Colher", "Colher de chá", "Faca de pão", "Garfo de sobremesa",
-    
-    // Panelas e Frigideiras
-    "Panela de pressão", "Panela", "Frigideira", "Caçarola", "Leiteira", "Chaleira",
-    
-    // Utensílios Básicos de Cozinha
-    "Concha", "Escumadeira", "Espátula", "Colher de pau", "Batedor de ovos", "Pegador",
-    "Abridor de latas", "Saca-rolhas", "Descascador", "Ralador", "Peneira", "Coador",
-    "Tábua de corte", "Rolo de massa", "Funil",
-    
-    // Assadeiras e Formas
-    "Assadeira", "Forma de bolo", "Forma de pizza", "Forma de pão", "Refratário",
-    
-    // Eletrodomésticos Comuns
-    "Liquidificador", "Batedeira", "Torradeira", "Cafeteira", "Micro-ondas", "Mixer",
-    
-    // Recipientes e Potes
-    "Tigela", "Jarra", "Potes", "Tupperware", "Garrafa térmica",
-    
-    // Itens para Servir
-    "Pratos", "Xícaras", "Copos", "Canecas", "Travessa", "Açucareiro", "Bule",
-    
-    // Utensílios de Medição
-    "Balança", "Xícaras medidoras", "Timer",
-    
-    // Itens Diversos
-    "Avental", "Luvas de forno", "Panos de prato", "Escorredor de louças", "Porta-talheres",
-    "Descanso de panela", "Guardanapos", "Papel toalha", "Papel alumínio", "Filme plástico"
+    { chave: 1, nome: "Garfo" },
+    { chave: 2, nome: "Faca" },
+    { chave: 3, nome: "Colher" },
+    { chave: 4, nome: "Colher de chá" },
+    { chave: 5, nome: "Faca de pão" },
+    { chave: 6, nome: "Garfo de sobremesa" },
+    { chave: 7, nome: "Panela de pressão" },
+    { chave: 8, nome: "Panela" },
+    { chave: 9, nome: "Frigideira" },
+    { chave: 10, nome: "Caçarola" },
+    { chave: 11, nome: "Leiteira" },
+    { chave: 12, nome: "Chaleira" },
+    { chave: 13, nome: "Concha" },
+    { chave: 14, nome: "Escumadeira" },
+    { chave: 15, nome: "Espátula" },
+    { chave: 16, nome: "Colher de pau" },
+    { chave: 17, nome: "Batedor de ovos" },
+    { chave: 18, nome: "Pegador" },
+    { chave: 19, nome: "Abridor de latas" },
+    { chave: 20, nome: "Saca-rolhas" },
+    { chave: 21, nome: "Descascador" },
+    { chave: 22, nome: "Ralador" },
+    { chave: 23, nome: "Peneira" },
+    { chave: 24, nome: "Coador" },
+    { chave: 25, nome: "Tábua de corte" },
+    { chave: 26, nome: "Rolo de massa" },
+    { chave: 27, nome: "Funil" },
+    { chave: 28, nome: "Assadeira" },
+    { chave: 29, nome: "Forma de bolo" },
+    { chave: 30, nome: "Forma de pizza" },
+    { chave: 31, nome: "Forma de pão" },
+    { chave: 32, nome: "Refratário" },
+    { chave: 33, nome: "Liquidificador" },
+    { chave: 34, nome: "Batedeira" },
+    { chave: 35, nome: "Torradeira" },
+    { chave: 36, nome: "Cafeteira" },
+    { chave: 37, nome: "Micro-ondas" },
+    { chave: 38, nome: "Mixer" },
+    { chave: 39, nome: "Tigela" },
+    { chave: 40, nome: "Jarra" },
+    { chave: 41, nome: "Potes" },
+    { chave: 42, nome: "Tupperware" },
+    { chave: 43, nome: "Garrafa térmica" },
+    { chave: 44, nome: "Pratos" },
+    { chave: 45, nome: "Xícaras" },
+    { chave: 46, nome: "Copos" },
+    { chave: 47, nome: "Canecas" },
+    { chave: 48, nome: "Travessa" },
+    { chave: 49, nome: "Açucareiro" },
+    { chave: 50, nome: "Bule" },
+    { chave: 51, nome: "Balança" },
+    { chave: 52, nome: "Xícaras medidoras" },
+    { chave: 53, nome: "Timer" },
+    { chave: 54, nome: "Avental" },
+    { chave: 55, nome: "Luvas de forno" },
+    { chave: 56, nome: "Panos de prato" },
+    { chave: 57, nome: "Escorredor de louças" },
+    { chave: 58, nome: "Porta-talheres" },
+    { chave: 59, nome: "Descanso de panela" },
+    { chave: 60, nome: "Guardanapos" },
+    { chave: 61, nome: "Papel toalha" },
+    { chave: 62, nome: "Papel alumínio" },
+    { chave: 63, nome: "Filme plástico" }
 ];
+
+// Função para obter chave pelo nome
+function obterChaveItem(nome) {
+    const obj = itensCozinha.find(item => item.nome === nome);
+    return obj ? obj.chave : null;
+}
+
+// Função para obter nome pelo chave
+function obterItemChave(chave) {
+    const obj = itensCozinha.find(item => item.chave === chave);
+    return obj ? obj.nome : null;
+}
 
 // Função para embaralhar array
 function embaralharArray(array) {
@@ -43,25 +96,15 @@ function embaralharArray(array) {
 
 // Função para gerar uma cartela única
 function gerarCartela(numeroCartela) {
-    console.log(`Gerando cartela número ${numeroCartela}`);
     const itensEmbaralhados = embaralharArray(itensCozinha);
-    const itensCartela = itensEmbaralhados.slice(0, 24); // 24 itens + 1 espaço livre no centro
-    console.log(`Itens selecionados para cartela ${numeroCartela}:`, itensCartela);
-    
+    const itensCartela = itensEmbaralhados.slice(0, 24);
+
     const cartela = document.createElement('div');
     cartela.className = 'cartela';
-    
-    // Gerar dados COMPLETOS para QR Code (igual ao teste do sorteio)
-    const dadosQR = {
-        numero: numeroCartela,
-        evento: 'Chá de Panela da Mari',
-        timestamp: new Date().toISOString(),
-        itens: itensCartela,
-        hash: gerarHashCartela(numeroCartela, itensCartela)
-    };
-    
-    console.log(`📦 Dados QR Code para cartela ${numeroCartela}:`, dadosQR);
-    
+
+    // Converter itens para chaves numéricas para QR Code
+    const chavesNumericas = itensCartela.map(item => item.chave);
+
     cartela.innerHTML = `
         <div class="cartela-numero">Cartela ${numeroCartela}</div>
         <div class="cartela-header">
@@ -79,311 +122,20 @@ function gerarCartela(numeroCartela) {
             ${gerarCelulas(itensCartela, numeroCartela)}
         </div>
     `;
-    
-    // Gerar QR Code após adicionar ao DOM
+
+    // Gerar QR Code com chaves numéricas após adicionar ao DOM
     setTimeout(() => {
-        gerarQRCodeMini(numeroCartela, JSON.stringify(dadosQR));
+        gerarQRCodeMini(numeroCartela, chavesNumericas);
     }, 500);
-    
-    console.log(`Cartela ${numeroCartela} criada com sucesso`);
+
     return cartela;
-}
-
-// Função para gerar dados do QR Code
-function gerarDadosQRCode(numeroCartela, itensCartela) {
-    // Dados completos para validação
-    const dados = {
-        numero: numeroCartela,
-        evento: 'Chá de Panela da Mari',
-        timestamp: new Date().toISOString(),
-        itens: itensCartela, // Lista completa de itens
-        hash: gerarHashCartela(numeroCartela, itensCartela) // Para verificar integridade
-    };
-    
-    console.log(`📦 Dados QR para cartela ${numeroCartela}:`, dados);
-    return JSON.stringify(dados);
-}
-
-// Função para gerar hash da cartela
-function gerarHashCartela(numero, itens) {
-    const dados = `${numero}-${itens.sort().join(',')}`;
-    let hash = 0;
-    for (let i = 0; i < dados.length; i++) {
-        const char = dados.charCodeAt(i);
-        hash = ((hash << 5) - hash) + char;
-        hash = hash & hash; // Converter para 32bit integer
-    }
-    return hash.toString();
-}
-
-// Função para detectar dispositivos móveis
-function isMobile() {
-    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-}
-
-// Função para detectar se é iOS
-function isIOS() {
-    return /iPad|iPhone|iPod/.test(navigator.userAgent);
-}
-
-// Função de fallback para mobile - cria QR Code usando canvas nativo
-function gerarQRCodeMobileFallback(elemento, dadosQR, numeroCartela) {
-    console.log('📱 Tentando fallback mobile...');
-    
-    // Criar um canvas para desenhar um QR code simples
-    const canvas = document.createElement('canvas');
-    const tamanho = isMobile() ? 80 : 50;
-    canvas.width = tamanho;
-    canvas.height = tamanho;
-    const ctx = canvas.getContext('2d');
-    
-    // Fundo branco
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, tamanho, tamanho);
-    
-    // Desenhar um padrão simples baseado nos dados
-    ctx.fillStyle = '#000000';
-    
-    // Criar um hash simples dos dados para o padrão
-    let hash = 0;
-    for (let i = 0; i < dadosQR.length; i++) {
-        hash = ((hash << 5) - hash + dadosQR.charCodeAt(i)) & 0xffffffff;
-    }
-    
-    // Desenhar padrão baseado no hash
-    const cellSize = Math.floor(tamanho / 10);
-    for (let x = 0; x < 10; x++) {
-        for (let y = 0; y < 10; y++) {
-            const index = x * 10 + y;
-            if ((hash >> (index % 32)) & 1) {
-                ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
-            }
-        }
-    }
-    
-    // Adicionar texto como fallback
-    ctx.fillStyle = '#000000';
-    ctx.font = '8px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText(`#${numeroCartela}`, tamanho/2, tamanho - 2);
-    
-    // Converter para imagem e adicionar ao elemento
-    const img = document.createElement('img');
-    img.src = canvas.toDataURL();
-    img.style.width = tamanho + 'px';
-    img.style.height = tamanho + 'px';
-    img.alt = `QR Code cartela ${numeroCartela}`;
-    
-    elemento.innerHTML = '';
-    elemento.appendChild(img);
-    
-    console.log(`✅ QR Code mobile fallback criado para cartela ${numeroCartela}`);
-}
-
-// Função para gerar QR Code mini no centro da cartela
-function gerarQRCodeMini(numeroCartela, dadosQR) {
-    const elemento = document.getElementById(`qr-mini-${numeroCartela}`);
-    const loading = document.querySelector(`#qr-cell-${numeroCartela} .qr-loading`);
-    
-    console.log(`🧪 Gerando QR Code para cartela ${numeroCartela} - MÉTODO IDÊNTICO AO TESTE`);
-    console.log('📍 Elemento encontrado:', !!elemento);
-    console.log('📦 QRCode disponível:', typeof QRCode);
-    console.log('� QRious disponível:', typeof QRious);
-    console.log('�📝 Dados QR:', dadosQR);
-    
-    if (!elemento) {
-        console.error(`❌ Elemento qr-mini-${numeroCartela} não encontrado!`);
-        return;
-    }
-
-    // Esconder loading primeiro
-    if (loading) {
-        loading.style.display = 'none';
-    }
-    
-    // Usar dados da cartela no formato JSON (igual ao teste)
-    const jsonTeste = JSON.stringify(dadosQR);
-    console.log('🧪 Dados do QR da cartela (formato teste):', jsonTeste);
-    
-    // CÓDIGO EXATAMENTE IGUAL AO SORTEIO.HTML
-    // Método 1: qrcode.js (mais compatível)
-    if (typeof QRCode !== 'undefined') {
-        console.log('✅ Usando qrcode.js');
-        elemento.innerHTML = ''; // Limpar primeiro
-        try {
-            const qrInstance = new QRCode(elemento, {
-                text: jsonTeste,
-                width: 50,
-                height: 50,
-                colorDark: '#000000',
-                colorLight: '#ffffff',
-                correctLevel: QRCode.CorrectLevel.M
-            });
-            console.log(`✅ QR Code instance criado para cartela ${numeroCartela}`, qrInstance);
-            
-            // Verificar se foi criado após um tempo
-            setTimeout(() => {
-                const qrContent = elemento.innerHTML;
-                console.log(`📊 Conteúdo do elemento após 500ms para cartela ${numeroCartela}:`, qrContent.substring(0, 100));
-                if (qrContent.length < 10) {
-                    console.log(`⚠️ QR parece vazio, tentando API para cartela ${numeroCartela}...`);
-                    tentarMetodo2Cartela(elemento, jsonTeste);
-                }
-            }, 500);
-            
-        } catch(error) {
-            console.error('❌ Erro com qrcode.js:', error);
-            tentarMetodo2Cartela(elemento, jsonTeste);
-        }
-    } else {
-        tentarMetodo2Cartela(elemento, jsonTeste);
-    }
-    
-// Função SUPER SIMPLES para gerar QR Code 
-function gerarQRCodeMini(numeroCartela, dadosQR) {
-    console.log(`🚀 GERANDO QR SIMPLES para cartela ${numeroCartela}`);
-    
-    const elemento = document.getElementById(`qr-mini-${numeroCartela}`);
-    if (!elemento) {
-        console.error(`❌ Elemento qr-mini-${numeroCartela} NÃO ENCONTRADO!`);
-        return;
-    }
-    
-    console.log(`✅ Elemento encontrado para cartela ${numeroCartela}`);
-    
-    // USAR SEMPRE API (mais confiável)
-    const textoSimples = `Cartela-${numeroCartela}`;
-    const url = `https://api.qrserver.com/v1/create-qr-code/?size=50x50&data=${encodeURIComponent(textoSimples)}&color=000000&bgcolor=ffffff`;
-    
-    elemento.innerHTML = `<img src="${url}" style="width:50px;height:50px;border:1px solid #000;" onload="console.log('QR ${numeroCartela} OK')" onerror="console.error('QR ${numeroCartela} ERRO')">`;
-    
-    console.log(`📡 QR ${numeroCartela} URL: ${url.substring(0, 80)}...`);
-}
-
-// Função para gerar QR com QRCode library
-function tentarGerarQRCodeLib(elemento, dadosQR, numeroCartela, tamanho = 50) {
-    console.log(`🔄 Gerando QR para cartela ${numeroCartela} - dados:`, dadosQR.substring(0, 100) + '...');
-    
-    // Limpar conteúdo anterior
-    elemento.innerHTML = '';
-    
-    // Verificar se QRCode está realmente disponível
-    if (typeof QRCode === 'undefined') {
-        console.error('❌ QRCode library não está disponível');
-        tentarMetodoAPI(elemento, dadosQR, numeroCartela, tamanho);
-        return;
-    }
-    
-    try {
-        // Usar exatamente o mesmo método do teste que funciona
-        console.log(`✅ Criando QR Code com new QRCode() para cartela ${numeroCartela}`);
-        new QRCode(elemento, {
-            text: dadosQR,
-            width: tamanho,
-            height: tamanho,
-            colorDark: '#000000',
-            colorLight: '#ffffff',
-            correctLevel: QRCode.CorrectLevel.M
-        });
-        
-        console.log('✅ QR Code criado com sucesso para cartela', numeroCartela);
-        
-    } catch (error) {
-        console.error(`❌ Erro ao criar QR Code:`, error);
-        console.log('🔄 Tentando método API como fallback...');
-        tentarMetodoAPI(elemento, dadosQR, numeroCartela, tamanho);
-    }
-}
-
-function tentarMetodoAPI(elemento, dadosQR, numeroCartela, tamanho) {
-    console.log(`🌐 Gerando QR via API para cartela ${numeroCartela}`);
-    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${tamanho}x${tamanho}&data=${encodeURIComponent(dadosQR)}&color=000000&bgcolor=ffffff`;
-    elemento.innerHTML = `<img src="${qrUrl}" alt="QR Code" style="width: ${tamanho}px; height: ${tamanho}px;" onload="console.log('QR API ${numeroCartela} carregado')" onerror="console.error('QR API ${numeroCartela} falhou')">`;
-}
-
-// Função para gerar QR com QRious library
-function tentarGerarQRCodeQRious(elemento, dadosQR, numeroCartela, tamanho = 50) {
-    try {
-        // Limpar conteúdo anterior
-        elemento.innerHTML = '';
-        
-        // Criar um canvas específico para o QR Code
-        const canvas = document.createElement('canvas');
-        canvas.id = `qr-canvas-${numeroCartela}`;
-        canvas.width = tamanho;
-        canvas.height = tamanho;
-        canvas.style.cssText = 'width: 100%; height: 100%; border-radius: 4px;';
-        
-        // Gerar QR Code com QRious
-        const qr = new QRious({
-            element: canvas,
-            value: dadosQR,
-            size: tamanho,
-            background: '#ffffff',
-            foreground: '#000000'  // COR PRETA
-        });
-        
-        console.log('✅ QR Code QRious gerado com sucesso para cartela', numeroCartela);
-        
-        // Adicionar o canvas ao elemento
-        elemento.appendChild(canvas);
-        elemento.classList.add('mostrar');
-        
-        // Adicionar atributos para debug
-        elemento.setAttribute('data-qr-gerado', 'true');
-        elemento.setAttribute('data-cartela', numeroCartela);
-        
-    } catch (error) {
-        console.error(`❌ Erro ao criar QR Code com QRious:`, error);
-        elemento.innerHTML = '<div style="font-size: 0.6rem; color: #e91e63; font-weight: bold;">QR</div>';
-        elemento.classList.add('mostrar');
-    }
-}
-
-// Função para carregar QR Code library dinamicamente
-function carregarQRCodeDinamico(elemento, dadosQR, numeroCartela, tamanho = 50) {
-    console.warn('⚠️ Carregando biblioteca QRCode dinamicamente...');
-    
-    const script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/npm/davidshimjs-qrcodejs@0.0.2/qrcode.min.js';
-    
-    script.onload = function() {
-        console.log('📚 Biblioteca QRCode carregada dinamicamente!');
-        setTimeout(() => {
-            if (typeof QRCode !== 'undefined') {
-                tentarGerarQRCodeLib(elemento, dadosQR, numeroCartela, tamanho);
-            } else {
-                console.error('❌ Ainda sem QRCode após carregamento dinâmico');
-                // Para mobile, tentar o fallback
-                if (isMobile()) {
-                    gerarQRCodeMobileFallback(elemento, dadosQR, numeroCartela);
-                } else {
-                    elemento.innerHTML = '<div style="font-size: 0.6rem; color: #e91e63; font-weight: bold;">QR</div>';
-                    elemento.classList.add('mostrar');
-                }
-            }
-        }, 100);
-    };
-    
-    script.onerror = function() {
-        console.error('❌ Falha ao carregar QRCode dinamicamente');
-        // Para mobile, tentar o fallback
-        if (isMobile()) {
-            gerarQRCodeMobileFallback(elemento, dadosQR, numeroCartela);
-        } else {
-            elemento.innerHTML = '<div style="font-size: 0.6rem; color: #e91e63; font-weight: bold;">QR</div>';
-            elemento.classList.add('mostrar');
-        }
-    };
-    
-    document.head.appendChild(script);
 }
 
 // Função para gerar as células da cartela (5x5)
 function gerarCelulas(itens, numeroCartela) {
     let celulas = '';
     let itemIndex = 0;
-    
+
     for (let i = 0; i < 25; i++) {
         if (i === 12) { // Posição central (QR Code)
             celulas += `<div class="bingo-cell free-space qr-center" id="qr-cell-${numeroCartela}">
@@ -391,11 +143,11 @@ function gerarCelulas(itens, numeroCartela) {
                 <div class="qr-loading">⏳</div>
             </div>`;
         } else {
-            celulas += `<div class="bingo-cell">${itens[itemIndex]}</div>`;
+            celulas += `<div class="bingo-cell">${itens[itemIndex].nome}</div>`;
             itemIndex++;
         }
     }
-    
+
     return celulas;
 }
 
@@ -1214,15 +966,15 @@ function verificarCartelas() {
 function testarQRCode() {
     console.log('🧪 Testando biblioteca QRCode...');
     console.log('QRCode disponível:', typeof QRCode);
-    
+
     if (typeof QRCode === 'undefined') {
         console.error('❌ Biblioteca QRCode não carregou!');
         mostrarMensagem('⚠️ Erro: QRCode não carregou. Recarregue a página!', 'warning');
         return;
     }
-    
+
     console.log('✅ QRCode library carregada com sucesso');
-    
+
     // Criar um elemento de teste
     const testeDiv = document.createElement('div');
     testeDiv.id = 'qr-teste';
@@ -1235,33 +987,30 @@ function testarQRCode() {
     testeDiv.style.border = '2px solid #e91e63';
     testeDiv.style.zIndex = '9999';
     document.body.appendChild(testeDiv);
-    
+
     try {
-        QRCode.toCanvas(testeDiv, 'TESTE-QR-CODE', {
+        // Corrigido para usar new QRCode() da biblioteca davidshimjs-qrcodejs
+        new QRCode(testeDiv, {
+            text: 'TESTE-QR-CODE',
             width: 50,
             height: 50,
-            margin: 1,
-            color: {
-                dark: '#000000',  // COR PRETA
-                light: '#ffffff'
-            }
-        }, function (error, canvas) {
-            if (error) {
-                console.error('❌ Erro no teste QR:', error);
-                testeDiv.remove();
-                mostrarMensagem('❌ Erro: QR Code não funciona!', 'warning');
-            } else {
-                console.log('✅ Teste QR Code bem-sucedido!');
-                // Remover teste após 3 segundos
-                setTimeout(() => {
-                    testeDiv.remove();
-                }, 3000);
-                mostrarMensagem('✅ QR Code funcionando! Pode gerar cartelas.', 'success');
-            }
+            colorDark: '#000000',
+            colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.M
         });
+        console.log('✅ Teste QR Code bem-sucedido!');
+        // Remover teste após 3 segundos
+        setTimeout(() => {
+            if (testeDiv && testeDiv.parentNode) {
+                testeDiv.parentNode.removeChild(testeDiv);
+            }
+        }, 3000);
+        mostrarMensagem('✅ QR Code funcionando! Pode gerar cartelas.', 'success');
     } catch (error) {
         console.error('❌ Erro crítico no QR Code:', error);
-        testeDiv.remove();
+        if (testeDiv && testeDiv.parentNode) {
+            testeDiv.parentNode.removeChild(testeDiv);
+        }
         mostrarMensagem('❌ Erro crítico no QR Code!', 'warning');
     }
 }
@@ -1359,64 +1108,104 @@ function testarQRCodesMobile() {
     }
 }
 
-// Nova função para debug dos QR Codes nas cartelas
-function debugQRCodes() {
-    console.log('🔍 DEBUGGING QR CODES...');
-    
-    const cartelas = document.querySelectorAll('.cartela');
-    const qrElements = document.querySelectorAll('.qr-code-mini');
-    const canvasElements = document.querySelectorAll('.qr-code-mini canvas');
-    
-    console.log(`📊 Estatísticas:
-    - Cartelas: ${cartelas.length}
-    - QR Elements: ${qrElements.length} 
-    - Canvas Elements: ${canvasElements.length}`);
-    
-    console.log(`🧪 Bibliotecas disponíveis:
-    - QRCode: ${typeof QRCode}
-    - QRious: ${typeof QRious}
-    - window.QRCode: ${typeof window.QRCode}`);
-    
-    // Verificar cada QR individualmente
-    qrElements.forEach((qr, index) => {
-        const canvas = qr.querySelector('canvas');
-        const hasDataAttr = qr.hasAttribute('data-qr-gerado');
-        
-        console.log(`🔍 QR ${index + 1}:`, {
-            element: !!qr,
-            canvas: !!canvas,
-            dataAttr: hasDataAttr,
-            canvasSize: canvas ? `${canvas.width}x${canvas.height}` : 'N/A',
-            innerHTML: qr.innerHTML.substring(0, 50) + (qr.innerHTML.length > 50 ? '...' : '')
-        });
-        
-        if (canvas && canvas.width > 0) {
-            const ctx = canvas.getContext('2d');
-            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            const hasContent = imageData.data.some(pixel => pixel !== 0 && pixel !== 255);
-            console.log(`  📈 Canvas ${index + 1} tem conteúdo:`, hasContent);
-            
-            if (hasContent) {
-                const dataURL = canvas.toDataURL();
-                console.log(`  📸 DataURL length:`, dataURL.length);
-            }
-        }
-    });
-    
-    // Se não há QR Codes, tentar gerar um manualmente para teste
-    if (canvasElements.length === 0) {
-        console.log('❌ Nenhum QR Code encontrado! Tentando teste manual...');
-        
-        // Encontrar primeiro elemento QR
-        const primeiroQR = qrElements[0];
-        if (primeiroQR) {
-            console.log('🧪 Testando geração manual no primeiro QR...');
-            const numeroCartela = primeiroQR.getAttribute('data-cartela') || '1';
-            gerarQRCodeMini(numeroCartela, `TESTE-${numeroCartela}`);
-        }
+// Função para detectar dispositivos móveis
+function isMobile() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
+// Função para detectar se é iOS
+function isIOS() {
+    return /iPad|iPhone|iPod/.test(navigator.userAgent);
+}
+
+// Função para gerar QR Code mini no centro da cartela
+function gerarQRCodeMini(numeroCartela, chavesNumericas) {
+    const elemento = document.getElementById(`qr-mini-${numeroCartela}`);
+    if (!elemento) {
+        console.error(`❌ Elemento qr-mini-${numeroCartela} não encontrado!`);
+        return;
     }
-    
-    mostrarMensagem(`🔍 Debug completo! Veja o console. QR: ${canvasElements.length}/${cartelas.length}`, 'info');
+    // Remover loading visual se existir
+    const loading = elemento.parentNode.querySelector('.qr-loading');
+    if (loading) loading.remove();
+
+    // Controle: só gera se não tiver data-qr-gerado
+    if (elemento.getAttribute('data-qr-gerado') === 'true') {
+        console.log(`⚠️ QR já gerado para cartela ${numeroCartela}, ignorando duplicidade.`);
+        return;
+    }
+
+    // Remover todos os filhos do elemento
+    while (elemento.firstChild) {
+        elemento.removeChild(elemento.firstChild);
+    }
+
+    // Aceitar array ou string
+    let textoQR = '';
+    if (Array.isArray(chavesNumericas)) {
+        if (chavesNumericas.length === 0) {
+            elemento.innerHTML = '<div style="color:#e91e63;font-size:10px;">QR vazio</div>';
+            console.warn(`⚠️ Chaves numéricas vazias para cartela ${numeroCartela}`);
+            return;
+        }
+        textoQR = chavesNumericas.join(',');
+    } else if (typeof chavesNumericas === 'string') {
+        textoQR = chavesNumericas;
+    } else {
+        elemento.innerHTML = '<div style="color:#e91e63;font-size:10px;">QR inválido</div>';
+        console.warn(`⚠️ QR inválido para cartela ${numeroCartela}`);
+        return;
+    }
+
+    // Tenta gerar QRCode usando a biblioteca QRCode se disponível
+    if (typeof QRCode !== 'undefined') {
+        try {
+            new QRCode(elemento, {
+                text: textoQR,
+                width: 50,
+                height: 50,
+                colorDark: '#000000',
+                colorLight: '#ffffff',
+                correctLevel: QRCode.CorrectLevel.M
+            });
+            // Espera até 1s para o canvas aparecer, senão faz fallback para img
+            setTimeout(() => {
+                const canvases = elemento.querySelectorAll('canvas');
+                if (canvases.length > 1) {
+                    Array.from(canvases).slice(1).forEach(c => c.remove());
+                }
+                const canvas = elemento.querySelector('canvas');
+                if (canvas) {
+                    // Remove qualquer <img> que tenha sido criado antes
+                    Array.from(elemento.querySelectorAll('img')).forEach(img => img.remove());
+                    canvas.style.display = 'block';
+                    canvas.style.margin = 'auto';
+                    canvas.style.width = '50px';
+                    canvas.style.height = '50px';
+                    elemento.setAttribute('data-qr-gerado', 'true');
+                    elemento.setAttribute('data-cartela', numeroCartela);
+                    console.log(`✅ Canvas QR gerado para cartela ${numeroCartela}`);
+                } else {
+                    // Fallback para imagem via API
+                    const url = `https://api.qrserver.com/v1/create-qr-code/?size=50x50&data=${encodeURIComponent(textoQR)}`;
+                    elemento.innerHTML = `<img src="${url}" style="width:50px;height:50px;" alt="QR Code" onerror="this.parentNode.innerHTML='<div style=\'color:#e91e63;font-size:10px;\'>Erro QR</div>';console.error('❌ Erro ao carregar QR da cartela ${numeroCartela}');">`;
+                    elemento.setAttribute('data-qr-gerado', 'true');
+                    elemento.setAttribute('data-cartela', numeroCartela);
+                    console.warn(`⚠️ Canvas não gerado, usando fallback img para cartela ${numeroCartela}`);
+                }
+            }, 1000);
+            return;
+        } catch (error) {
+            console.error('❌ Erro ao gerar QRCode com biblioteca:', error);
+        }
+    } else {
+        // Fallback para imagem via API se biblioteca não disponível
+        const url = `https://api.qrserver.com/v1/create-qr-code/?size=50x50&data=${encodeURIComponent(textoQR)}`;
+        elemento.innerHTML = `<img src="${url}" style="width:50px;height:50px;" alt="QR Code" onerror="this.parentNode.innerHTML='<div style=\'color:#e91e63;font-size:10px;\'>Erro QR</div>';console.error('❌ Erro ao carregar QR da cartela ${numeroCartela}');">`;
+        elemento.setAttribute('data-qr-gerado', 'true');
+        elemento.setAttribute('data-cartela', numeroCartela);
+        console.log(`🧪 Gerando QR para cartela ${numeroCartela}:`, textoQR);
+    }
 }
 
 // Event Listeners
@@ -1524,24 +1313,59 @@ document.addEventListener('DOMContentLoaded', function() {
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
-        
         @keyframes slideOut {
             from { transform: translateX(0); opacity: 1; }
             to { transform: translateX(100%); opacity: 0; }
         }
-        
         button:disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
-        
         .cartelas-grid {
             animation: fadeIn 0.5s ease;
         }
-        
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+        /* QRCode central limpo, sem borda, fundo ou sombra, tamanho exato */
+        .qr-code-mini {
+            width: 50px !important;
+            height: 50px !important;
+            min-width: 50px !important;
+            min-height: 50px !important;
+            max-width: 50px !important;
+            max-height: 50px !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            position: static !important;
+            opacity: 1 !important;
+            padding: 0 !important;
+        }
+        .qr-code-mini canvas, .qr-code-mini img {
+            width: 50px !important;
+            height: 50px !important;
+            min-width: 50px !important;
+            min-height: 50px !important;
+            max-width: 50px !important;
+            max-height: 50px !important;
+            display: block !important;
+            margin: 0 auto !important;
+            background: transparent !important;
+            border: none !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            opacity: 1 !important;
+            position: static !important;
+            padding: 0 !important;
+        }
+        .qr-center {
+            overflow: visible !important;
         }
     `;
     document.head.appendChild(style);
