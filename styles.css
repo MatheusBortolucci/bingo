@@ -333,16 +333,43 @@ header h2 {
         font-family: 'Dancing Script', cursive !important;
     }
     
-    /* Esconder tudo que não seja cartela */
-    header, 
-    .controls, 
-    .mensagem,
-    nav,
-    footer,
-    .cartela-numero,
-    .sorteio-link,
-    .mensagem-toast {
+    /* Esconder TUDO primeiro */
+    * {
         display: none !important;
+        visibility: hidden !important;
+    }
+    
+    /* Mostrar APENAS elementos das cartelas */
+    body,
+    .cartelas-grid,
+    .cartela,
+    .cartela-header,
+    .cartela-decoracao,
+    .cartela-titulo,
+    .cartela-subtitulo,
+    .estrela,
+    .coracao,
+    .bingo-grid,
+    .bingo-cell {
+        display: block !important;
+        visibility: visible !important;
+    }
+    
+    /* Corrigir display específicos */
+    .cartelas-grid {
+        display: grid !important;
+    }
+    
+    .bingo-grid {
+        display: grid !important;
+    }
+    
+    .bingo-cell {
+        display: flex !important;
+    }
+    
+    .cartela-decoracao {
+        display: flex !important;
     }
     
     .cartelas-grid {
