@@ -219,54 +219,6 @@ function imprimirCartelas() {
         return;
     }
     
-    // Aplicar configurações específicas de impressão
-    const style = document.createElement('style');
-    style.id = 'print-config';
-    style.textContent = `
-        @page {
-            size: A4;
-            margin: 5mm;
-        }
-        
-        @media print {
-            /* Remove cabeçalhos e rodapés do navegador */
-            html, body {
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            }
-            
-            .cartela {
-                display: block !important;
-                width: 190mm !important;
-                height: 250mm !important;
-                margin: 0 auto !important;
-                background: #fef7f7 !important;
-            }
-            
-            .mensagem {
-                display: none !important;
-            }
-            
-            .cartela-numero {
-                display: none !important;
-            }
-            
-            .bingo-grid {
-                display: grid !important;
-                grid-template-columns: repeat(5, 1fr) !important;
-                grid-template-rows: repeat(5, 1fr) !important;
-                height: 180mm !important;
-            }
-            
-            .bingo-cell {
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-            }
-        }
-    `;
-    document.head.appendChild(style);
-    
     // Esconder todas as mensagens antes de imprimir
     const mensagens = document.querySelectorAll('.mensagem');
     mensagens.forEach(msg => msg.style.display = 'none');
@@ -275,13 +227,9 @@ function imprimirCartelas() {
     setTimeout(() => {
         window.print();
         
-        // Restaurar mensagens e remover estilo temporário após a impressão
+        // Restaurar mensagens após a impressão
         setTimeout(() => {
             mensagens.forEach(msg => msg.style.display = '');
-            const printStyle = document.getElementById('print-config');
-            if (printStyle) {
-                printStyle.remove();
-            }
         }, 1000);
     }, 200);
 }

@@ -314,11 +314,11 @@ header h2 {
     font-weight: bold;
 }
 
-/* Estilos para impressão - 1 cartela por página */
+/* Estilos para impressão - 4 cartelas por página */
 @media print {
     @page {
         size: A4;
-        margin: 5mm;
+        margin: 8mm;
         /* Remove cabeçalhos e rodapés da impressão */
         @top-left { content: ""; }
         @top-right { content: ""; }
@@ -339,24 +339,35 @@ header h2 {
     }
     
     .cartelas-grid {
-        display: block;
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: repeat(2, 1fr);
+        gap: 4mm;
         padding: 0;
         margin: 0;
+        width: 100%;
+        height: 100vh;
+        box-sizing: border-box;
     }
     
     .cartela {
-        width: 190mm;
-        height: 250mm;
-        padding: 15mm;
+        width: 88mm !important; /* Metade da largura A4 menos margens */
+        height: 120mm !important; /* Altura reduzida para caber 2 linhas */
+        padding: 6mm;
         margin: 0;
         background: #fef7f7 !important; /* Rosa bem clarinho */
-        border: 3px solid #e91e63;
-        border-radius: 10mm;
+        border: 1.5mm solid #e91e63;
+        border-radius: 4mm;
         box-shadow: none;
-        page-break-after: always;
         page-break-inside: avoid;
         transform: none;
         position: relative;
+        box-sizing: border-box;
+    }
+    
+    /* Quebrar página a cada 4 cartelas */
+    .cartela:nth-child(4n) {
+        page-break-after: always;
     }
     
     .cartela:last-child {
@@ -368,36 +379,36 @@ header h2 {
     }
     
     .cartela-header {
-        height: 25mm;
-        margin-bottom: 8mm;
+        height: 15mm;
+        margin-bottom: 4mm;
     }
     
     .cartela-titulo {
-        font-size: 5mm;
+        font-size: 3.5mm;
     }
     
     .cartela-subtitulo {
-        font-size: 8mm;
+        font-size: 5mm;
     }
     
     .bingo-grid {
-        height: 180mm;
-        gap: 1mm;
-        border: 2mm solid #e91e63;
+        height: 85mm;
+        gap: 0.5mm;
+        border: 1mm solid #e91e63;
         display: grid;
         grid-template-columns: repeat(5, 1fr);
         grid-template-rows: repeat(5, 1fr);
     }
     
     .bingo-cell {
-        font-size: 3.5mm;
-        border: 1mm solid #e91e63;
-        padding: 2mm;
+        font-size: 2.2mm;
+        border: 0.5mm solid #e91e63;
+        padding: 1mm;
         display: flex;
         align-items: center;
         justify-content: center;
         text-align: center;
-        line-height: 1.2;
+        line-height: 1.1;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
     }
@@ -457,7 +468,7 @@ header h2 {
     .bingo-cell:nth-child(13) {
         background: #fce4ec !important;
         color: #e91e63 !important;
-        font-size: 4mm;
+        font-size: 2.8mm;
     }
 }
 
