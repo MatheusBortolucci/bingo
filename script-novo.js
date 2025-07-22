@@ -146,24 +146,18 @@ function gerarQRCodeMini(numeroCartela) {
     // ARMAZENAR NA BASE DE DADOS LOCAL (para uso no mesmo dispositivo)
     window.cartelasDatabase[cartelaId] = dadosCompletos;
     
-    // QR CODE ULTRA COMPACTO COM CHAVES (para funcionar entre dispositivos)
-    const chavesItens = itensCartela.map(item => obterChaveItem(item)).filter(chave => chave);
-    const dadosCompactos = {
-        id: cartelaId,
-        n: numeroCartela,
-        k: chavesItens // Array de chaves como ["A1", "B3", "C5", ...]
-    };
-    const textoQR = JSON.stringify(dadosCompactos);
+    // QR CODE SIMPLES COM APENAS AS PALAVRAS
+    const textoQR = JSON.stringify(itensCartela);
     const url = `https://api.qrserver.com/v1/create-qr-code/?size=50x50&data=${encodeURIComponent(textoQR)}`;
     
     // REMOVER BORDAS DE DEBUG E USAR COR PRETA
     elemento.style.border = 'none';
     elemento.style.backgroundColor = 'transparent';
-    elemento.innerHTML = `<img src="${url}" style="width:50px!important;height:50px!important;display:block!important;" onload="console.log('✅ QR ${numeroCartela} ID: ${cartelaId} (${textoQR.length} chars)')" onerror="console.error('❌ QR ${numeroCartela} falhou')">`;
+    elemento.innerHTML = `<img src="${url}" style="width:50px!important;height:50px!important;display:block!important;" onload="console.log('✅ QR ${numeroCartela} (${textoQR.length} chars)')" onerror="console.error('❌ QR ${numeroCartela} falhou')">`;
     
-    console.log(`📡 Cartela ${numeroCartela} - ID: ${cartelaId} - QR Ultra Compacto`);
+    console.log(`📡 Cartela ${numeroCartela} - QR com ${itensCartela.length} palavras`);
     console.log(`📏 Tamanho dos dados: ${textoQR.length} caracteres`);
-    console.log(`🔑 Chaves: ${chavesItens.join(', ')}`);
+    console.log(`� Palavras: ${itensCartela.join(', ')}`);
     
     // Verificar se o elemento pai tem problemas de CSS
     const pai = elemento.parentElement;
