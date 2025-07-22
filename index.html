@@ -8,8 +8,74 @@
     <!-- Bibliotecas para geração de PDF - versões estáveis -->
     <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
     <script src="https://unpkg.com/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-    <!-- Biblioteca para geração de QR Code -->
-    <script src="https://unpkg.com/qrcode@1.5.3/build/qrcode.min.js"></script>
+    
+    <!-- Biblioteca para geração de QR Code - múltiplas fontes para garantir carregamento -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js" onload="console.log('QRCode v1 carregado')"></script>
+    <script src="https://unpkg.com/qrcode@1.5.3/build/qrcode.js" onload="console.log('QRCode v2 carregado')"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js" onload="console.log('QRious carregado')"></script>
+    
+    <script>
+        // Verificar e garantir que QRCode funcione
+        window.addEventListener('load', function() {
+            console.log('🔍 Verificando bibliotecas QR...');
+            console.log('QRCode disponível:', typeof QRCode);
+            console.log('QRious disponível:', typeof QRious);
+            
+            // Se QRCode não estiver disponível, tentar usar QRious como alternativa
+            if (typeof QRCode === 'undefined' && typeof QRious !== 'undefined') {
+                console.log('🔄 Usando QRious como alternativa...');
+                window.QRCode = {
+                    toCanvas: function(element, text, options, callback) {
+                        try {
+                            const qr = new QRious({
+                                element: element.tagName === 'CANVAS' ? element : null,
+                                value: text,
+                                size: options.width || 50,
+                                background: options.color ? options.color.light : 'white',
+                                foreground: options.color ? options.color.dark : 'black'
+                            });
+                            
+                            if (element.tagName !== 'CANVAS') {
+                                const canvas = document.createElement('canvas');
+                                canvas.width = options.width || 50;
+                                canvas.height = options.height || 50;
+                                element.appendChild(canvas);
+                                
+                                const qrCanvas = new QRious({
+                                    element: canvas,
+                                    value: text,
+                                    size: options.width || 50,
+                                    background: options.color ? options.color.light : 'white',
+                                    foreground: options.color ? options.color.dark : 'black'
+                                });
+                            }
+                            
+                            callback(null);
+                        } catch (error) {
+                            callback(error);
+                        }
+                    }
+                };
+            }
+            
+            if (typeof QRCode === 'undefined') {
+                console.error('❌ Nenhuma biblioteca QR carregou!');
+                // Tentar carregar manualmente
+                const script = document.createElement('script');
+                script.src = 'https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js';
+                script.onload = function() {
+                    console.log('✅ QRCode manual carregado!');
+                };
+                document.head.appendChild(script);
+            }
+        });
+    </script>
+</head>
+                script.onload = () => console.log('QRCode carregado via fallback');
+                document.head.appendChild(script);
+            }
+        });
+    </script>
 </head>
 <body>
     <header class="no-print">
@@ -25,6 +91,7 @@
             <button id="imprimirCartelas" class="btn-tertiary">🖨️ Imprimir Navegador</button>
             <button id="novasCartelas" class="btn-tertiary">🔄 Gerar Novas Cartelas</button>
             <button id="testarCaptura" class="btn-tertiary" style="font-size: 0.8rem;">🔧 Testar Captura</button>
+            <button id="debugQR" class="btn-tertiary" style="font-size: 0.8rem; background-color: #ff9800;">🔍 Debug QR</button>
         </div>
         
         <div class="sorteio-link no-print">
