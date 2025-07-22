@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sorteio e Validação - Bingo da Mari</title>
+    
+    <!-- Bibliotecas de QR Code para geração -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js" onload="console.log('QRCode v1 carregado')"></script>
+    <script src="https://unpkg.com/qrcode@1.5.3/build/qrcode.js" onload="console.log('QRCode v2 carregado')"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js" onload="console.log('QRious carregado')"></script>
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js" onload="console.log('QRCodeJS carregado')"></script>
+    
     <style>
         * {
             margin: 0;
@@ -347,6 +354,11 @@
                             <!-- Botão de teste para debug -->
                             <button onclick="gerarQRCodeTeste()" class="btn" style="background: linear-gradient(135deg, #ff9800, #ffb74d); padding: 10px 20px; font-size: 14px; width: 100%; margin: 5px 0;">
                                 🧪 Gerar QR de Teste
+                            </button>
+                            
+                            <!-- Botão para verificar bibliotecas -->
+                            <button onclick="verificarBibliotecas()" class="btn" style="background: linear-gradient(135deg, #9c27b0, #ba68c8); padding: 8px 16px; font-size: 12px; width: 100%; margin: 3px 0;">
+                                🔍 Verificar Bibliotecas
                             </button>
                         </div>
                         
@@ -1290,21 +1302,46 @@
             carregarEstadoSorteio();
         });
         
+        // Função para verificar bibliotecas disponíveis
+        function verificarBibliotecas() {
+            console.log('🔍 Verificando bibliotecas disponíveis...');
+            
+            const bibliotecas = {
+                'jsQR': typeof jsQR !== 'undefined',
+                'QRCode (npm)': typeof QRCode !== 'undefined' && QRCode.toCanvas,
+                'QRCode (js)': typeof QRCode !== 'undefined' && !QRCode.toCanvas,
+                'QRious': typeof QRious !== 'undefined',
+                'Instascan': typeof Instascan !== 'undefined',
+                'Quagga': typeof Quagga !== 'undefined'
+            };
+            
+            let relatorio = '📚 Bibliotecas Disponíveis:\n\n';
+            for (const [nome, disponivel] of Object.entries(bibliotecas)) {
+                relatorio += `${disponivel ? '✅' : '❌'} ${nome}\n`;
+            }
+            
+            console.log(relatorio);
+            alert(relatorio);
+            mostrarFeedback('🔍 Relatório de bibliotecas exibido no console', 'info');
+        }
+        
         // ==================== SCANNER ESPECIAL IPHONE ====================
         
         // Função para gerar QR Code de teste
         function gerarQRCodeTeste() {
             console.log('🧪 Gerando QR Code de teste...');
             
-            // Dados de teste simulando uma cartela
+            // Dados de teste compatíveis com o formato das cartelas reais
             const dadosTeste = {
                 numero: 999,
                 evento: 'Chá de Panela da Mari',
                 timestamp: new Date().toISOString(),
-                itens: ['Panela', 'Colher', 'Garfo', 'Faca'] // Itens de teste
+                itens: ['Panela', 'Colher', 'Garfo', 'Faca'], // Alguns itens de teste
+                hash: 'teste123'
             };
             
             const jsonTeste = JSON.stringify(dadosTeste);
+            console.log('🧪 Dados do QR de teste:', jsonTeste);
             
             // Criar QR Code
             const qrContainer = document.createElement('div');
@@ -1324,7 +1361,7 @@
             qrContainer.innerHTML = `
                 <h3>🧪 QR Code de Teste</h3>
                 <div id="qrTeste" style="margin: 15px 0;"></div>
-                <p style="font-size: 12px; color: #666;">Use este QR para testar o scanner</p>
+                <p style="font-size: 12px; color: #666;">JSON: ${jsonTeste}</p>
                 <button onclick="this.parentElement.remove()" style="background: #f44336; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
                     ❌ Fechar
                 </button>
@@ -1332,17 +1369,34 @@
             
             document.body.appendChild(qrContainer);
             
-            // Gerar QR Code usando a biblioteca
+            // Tentar diferentes métodos de gerar QR Code
+            const qrDiv = document.getElementById('qrTeste');
+            
+            // Método 1: qrcode.js (mais compatível)
             if (typeof QRCode !== 'undefined') {
-                new QRCode(document.getElementById('qrTeste'), {
-                    text: jsonTeste,
-                    width: 200,
-                    height: 200,
-                    colorDark: '#000000',
-                    colorLight: '#ffffff'
-                });
+                console.log('✅ Usando qrcode.js');
+                try {
+                    new QRCode(qrDiv, {
+                        text: jsonTeste,
+                        width: 200,
+                        height: 200,
+                        colorDark: '#000000',
+                        colorLight: '#ffffff',
+                        correctLevel: QRCode.CorrectLevel.M
+                    });
+                } catch(error) {
+                    console.error('❌ Erro com qrcode.js:', error);
+                    tentarMetodo2();
+                }
             } else {
-                document.getElementById('qrTeste').innerHTML = '<p>QRCode.js não carregado</p>';
+                tentarMetodo2();
+            }
+            
+            function tentarMetodo2() {
+                // Método 2: QR Code via API
+                console.log('🔄 Tentando API QR...');
+                const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(jsonTeste)}`;
+                qrDiv.innerHTML = `<img src="${qrUrl}" alt="QR Code" style="width: 200px; height: 200px;">`;
             }
             
             mostrarFeedback('🧪 QR Code de teste gerado! Use o scanner para testá-lo.', 'info');

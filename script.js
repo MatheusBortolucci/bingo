@@ -92,16 +92,16 @@ function gerarCartela(numeroCartela) {
 
 // Função para gerar dados do QR Code
 function gerarDadosQRCode(numeroCartela, itensCartela) {
-    // Criar hash para verificar integridade
-    const hash = gerarHashCartela(numeroCartela, itensCartela);
-    
-    // Dados mais simples para o QR Code
+    // Dados completos para validação
     const dados = {
-        n: numeroCartela,
-        h: hash,
-        e: "Mari"
+        numero: numeroCartela,
+        evento: 'Chá de Panela da Mari',
+        timestamp: new Date().toISOString(),
+        itens: itensCartela, // Lista completa de itens
+        hash: gerarHashCartela(numeroCartela, itensCartela) // Para verificar integridade
     };
     
+    console.log(`📦 Dados QR para cartela ${numeroCartela}:`, dados);
     return JSON.stringify(dados);
 }
 
