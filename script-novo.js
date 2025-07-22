@@ -120,24 +120,28 @@ function gerarQRCodeMini(numeroCartela) {
     // CRIAR ID ÚNICO SIMPLES
     const cartelaId = `MARI${numeroCartela.toString().padStart(2, '0')}${Date.now().toString().slice(-4)}`;
     
-    // ARMAZENAR NA BASE DE DADOS LOCAL
-    window.cartelasDatabase[cartelaId] = {
+    // CRIAR DADOS COMPLETOS PARA O QR CODE
+    const dadosCompletos = {
+        id: cartelaId,
         numero: numeroCartela,
         itens: itensCartela,
         evento: 'Chá de Panela da Mari',
         criadaEm: new Date().toISOString()
     };
     
-    // QR CODE SUPER SIMPLES - só o ID
-    const textoQR = cartelaId;
-    const url = `https://api.qrserver.com/v1/create-qr-code/?size=50x50&data=${textoQR}`;
+    // ARMAZENAR NA BASE DE DADOS LOCAL (para uso no mesmo dispositivo)
+    window.cartelasDatabase[cartelaId] = dadosCompletos;
+    
+    // QR CODE COM DADOS COMPLETOS (para funcionar entre dispositivos)
+    const textoQR = JSON.stringify(dadosCompletos);
+    const url = `https://api.qrserver.com/v1/create-qr-code/?size=50x50&data=${encodeURIComponent(textoQR)}`;
     
     // REMOVER BORDAS DE DEBUG E USAR COR PRETA
     elemento.style.border = 'none';
     elemento.style.backgroundColor = 'transparent';
     elemento.innerHTML = `<img src="${url}" style="width:50px!important;height:50px!important;display:block!important;" onload="console.log('✅ QR ${numeroCartela} ID: ${cartelaId}')" onerror="console.error('❌ QR ${numeroCartela} falhou')">`;
     
-    console.log(`📡 Cartela ${numeroCartela} - ID: ${cartelaId}`);
+    console.log(`📡 Cartela ${numeroCartela} - ID: ${cartelaId} - Dados completos no QR`);
     
     // Verificar se o elemento pai tem problemas de CSS
     const pai = elemento.parentElement;

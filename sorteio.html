@@ -264,6 +264,8 @@
                 <div class="scanner-controls">
                     <button id="iniciarScanner" class="btn">📷 Iniciar Scanner</button>
                     <button id="pararScanner" class="btn secondary" style="display: none;">⏹️ Parar Scanner</button>
+                    <button id="testarValidacao" class="btn" style="background: linear-gradient(135deg, #9c27b0, #ba68c8);">🧪 Teste de Validação</button>
+                    <button id="debugDatabase" class="btn" style="background: linear-gradient(135deg, #ff5722, #ff7043);">🔍 Debug Database</button>
                 </div>
                 
                 <video id="scanner-video" autoplay playsinline></video>
@@ -359,6 +361,8 @@
             const reiniciarBtn = document.getElementById('reiniciarSorteio');
             const iniciarScannerBtn = document.getElementById('iniciarScanner');
             const pararScannerBtn = document.getElementById('pararScanner');
+            const testarBtn = document.getElementById('testarValidacao');
+            const debugBtn = document.getElementById('debugDatabase');
             
             if (sortearBtn) {
                 sortearBtn.addEventListener('click', function() {
@@ -390,6 +394,22 @@
                     pararScanner();
                 });
                 console.log('✅ Event listener do parar scanner configurado');
+            }
+            
+            if (testarBtn) {
+                testarBtn.addEventListener('click', function() {
+                    console.log('🧪 Botão teste clicado!');
+                    testarValidacao();
+                });
+                console.log('✅ Event listener do teste configurado');
+            }
+            
+            if (debugBtn) {
+                debugBtn.addEventListener('click', function() {
+                    console.log('🔍 Botão debug clicado!');
+                    debugDatabase();
+                });
+                console.log('✅ Event listener do debug configurado');
             }
             
             console.log('🎯 Todos os event listeners configurados!');
@@ -634,21 +654,24 @@
                 let cartelaId = dadosQR;
                 let dadosCartela = null;
                 
-                // Sistema novo (ID simples)
-                if (typeof dadosQR === 'string' && dadosQR.match(/^MARI\d+/)) {
-                    const database = JSON.parse(localStorage.getItem('cartelasDatabase') || '{}');
-                    dadosCartela = database[cartelaId];
-                    
-                    if (!dadosCartela) {
-                        throw new Error(`Cartela ${cartelaId} não encontrada na base de dados`);
-                    }
-                } else {
-                    // Sistema antigo (JSON)
-                    try {
-                        dadosCartela = JSON.parse(dadosQR);
-                        cartelaId = dadosCartela.hash || `Cartela-${dadosCartela.numero}`;
-                    } catch (parseError) {
-                        throw new Error('QR Code inválido - não é um JSON válido nem um ID de cartela');
+                // TENTAR JSON PRIMEIRO (dados completos - funciona entre dispositivos)
+                try {
+                    dadosCartela = JSON.parse(dadosQR);
+                    cartelaId = dadosCartela.id || dadosCartela.hash || `Cartela-${dadosCartela.numero}`;
+                    console.log('✅ QR Code com dados completos detectado');
+                } catch (parseError) {
+                    // SE NÃO FOR JSON, TENTAR COMO ID SIMPLES (só funciona no mesmo dispositivo)
+                    if (typeof dadosQR === 'string' && dadosQR.match(/^MARI\d+/)) {
+                        console.log('🔍 Tentando buscar na base de dados local...');
+                        const database = JSON.parse(localStorage.getItem('cartelasDatabase') || '{}');
+                        dadosCartela = database[cartelaId];
+                        
+                        if (!dadosCartela) {
+                            throw new Error(`Cartela ${cartelaId} não encontrada na base de dados local. Use o mesmo dispositivo onde as cartelas foram geradas ou gere cartelas com QR codes completos.`);
+                        }
+                        console.log('✅ Cartela encontrada na base local');
+                    } else {
+                        throw new Error('QR Code inválido - não contém dados válidos');
                     }
                 }
 
@@ -686,6 +709,7 @@
                         <h4>📋 Cartela ${dadosCartela.numero}</h4>
                         <p><strong>ID:</strong> ${cartelaId}</p>
                         <p><strong>Progresso:</strong> ${progresso}% (${cartelaSorteados.length}/${itensCartela.length})</p>
+                        <p><strong>Fonte:</strong> ${dadosCartela.evento || 'N/A'}</p>
                         
                         <h5>✅ Itens sorteados (${cartelaSorteados.length}):</h5>
                         <p>${cartelaSorteados.join(', ') || 'Nenhum'}</p>
@@ -716,9 +740,81 @@
                     infoDiv.innerHTML = `
                         <h4>⚠️ Erro na Validação</h4>
                         <p>QR Code inválido ou cartela não encontrada</p>
-                        <p><strong>Dados:</strong> ${dadosQR.substring(0, 100)}...</p>
+                        <p><strong>Erro:</strong> ${error.message}</p>
+                        <p><strong>Dica:</strong> Se as cartelas foram geradas em outro dispositivo, certifique-se de que foram geradas com a versão atualizada que inclui dados completos no QR Code.</p>
+                        <details>
+                            <summary>Dados recebidos (clique para expandir)</summary>
+                            <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px; font-size: 12px; overflow-x: auto;">${dadosQR.substring(0, 300)}...</pre>
+                        </details>
                     `;
                 }
+            }
+        }
+
+        // ========== FUNÇÃO DE TESTE/DEBUG ==========
+        
+        function testarValidacao() {
+            console.log('🧪 Iniciando teste de validação...');
+            
+            // Criar uma cartela de teste com dados completos (simulando QR code cross-device)
+            const cartelaIdTeste = 'MARI01TEST';
+            const itensTeste = itensBingo.slice(0, 24); // Primeiros 24 itens
+            
+            const cartelaTeste = {
+                id: cartelaIdTeste,
+                numero: 1,
+                itens: itensTeste,
+                evento: 'Chá de Panela da Mari - TESTE',
+                criadaEm: new Date().toISOString()
+            };
+            
+            console.log('✅ Cartela de teste criada:', cartelaTeste);
+            
+            // Simular QR code com dados completos (como seria entre dispositivos)
+            const qrCompleto = JSON.stringify(cartelaTeste);
+            console.log('📱 Simulando scan de QR code com dados completos...');
+            
+            // Testar validação
+            validarCartela(qrCompleto);
+        }
+
+        function debugDatabase() {
+            console.log('🔍 DEBUG: Verificando base de dados...');
+            
+            const database = JSON.parse(localStorage.getItem('cartelasDatabase') || '{}');
+            const chaves = Object.keys(database);
+            
+            console.log('📊 Total de cartelas:', chaves.length);
+            console.log('🔑 IDs das cartelas:', chaves);
+            
+            if (chaves.length > 0) {
+                console.log('📋 Primeira cartela como exemplo:', database[chaves[0]]);
+            }
+            
+            const resultadoDiv = document.getElementById('resultadoValidacao');
+            const infoDiv = document.getElementById('cartelaInfo');
+            
+            if (resultadoDiv) {
+                resultadoDiv.style.display = 'block';
+                resultadoDiv.className = 'resultado-validacao';
+                resultadoDiv.style.background = '#f0f0f0';
+                resultadoDiv.style.color = '#333';
+                resultadoDiv.innerHTML = `
+                    📊 <strong>DEBUG - Base de Dados</strong><br>
+                    Total de cartelas: ${chaves.length}<br>
+                    ${chaves.length > 0 ? 'Status: ✅ OK' : 'Status: ❌ Vazia'}
+                `;
+            }
+            
+            if (infoDiv && chaves.length > 0) {
+                infoDiv.style.display = 'block';
+                infoDiv.innerHTML = `
+                    <h4>🔍 Análise da Base de Dados</h4>
+                    <p><strong>Total:</strong> ${chaves.length} cartelas</p>
+                    <p><strong>IDs:</strong> ${chaves.slice(0, 5).join(', ')}${chaves.length > 5 ? '...' : ''}</p>
+                    <p><strong>Exemplo de estrutura:</strong></p>
+                    <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px; font-size: 12px; overflow-x: auto;">${JSON.stringify(database[chaves[0]], null, 2)}</pre>
+                `;
             }
         }
 
