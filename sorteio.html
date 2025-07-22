@@ -698,8 +698,39 @@
         let videoStream = null;
         let scannerAtivo = false;
         let scannerInterval = null;
+        let barcodeDetector = null;
 
-        // Função para iniciar a câmera e scanner
+        // Função para detectar capacidades do dispositivo
+        function detectarCapacidadesScanner() {
+            const capacidades = {
+                barcodeDetector: 'BarcodeDetector' in window,
+                getUserMedia: 'mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices,
+                jsQR: typeof jsQR !== 'undefined'
+            };
+            
+            console.log('📱 Capacidades de scanner detectadas:', capacidades);
+            return capacidades;
+        }
+
+        // Função para inicializar detector nativo
+        async function inicializarBarcodeDetector() {
+            try {
+                if ('BarcodeDetector' in window) {
+                    const formatos = await BarcodeDetector.getSupportedFormats();
+                    console.log('🎯 Formatos suportados pelo BarcodeDetector:', formatos);
+                    
+                    if (formatos.includes('qr_code')) {
+                        barcodeDetector = new BarcodeDetector({ formats: ['qr_code'] });
+                        return true;
+                    }
+                }
+            } catch (error) {
+                console.log('⚠️ BarcodeDetector não disponível:', error.message);
+            }
+            return false;
+        }
+
+        // Função para iniciar a câmera e scanner com API moderna
         async function iniciarScanner() {
             const video = document.getElementById('cameraVideo');
             const canvas = document.getElementById('qrCanvas');
@@ -707,75 +738,205 @@
             const cameraContainer = document.getElementById('cameraContainer');
             const botoesScanner = document.getElementById('botoesScanner');
 
+            mostrarFeedback('📷 Iniciando scanner QR...', 'info');
+            
+            const capacidades = detectarCapacidadesScanner();
+            
+            if (!capacidades.getUserMedia) {
+                mostrarFeedback('❌ Seu navegador não suporta acesso à câmera', 'error');
+                return;
+            }
+
             try {
-                // Solicitar acesso à câmera
-                videoStream = await navigator.mediaDevices.getUserMedia({
-                    video: { 
-                        facingMode: 'environment' // Câmera traseira preferida
-                    }
+                // Verificar se BarcodeDetector está disponível
+                const temBarcodeDetector = await inicializarBarcodeDetector();
+                
+                // Configurações otimizadas para leitura de QR Code
+                const constraints = {
+                    video: {
+                        facingMode: { ideal: 'environment' }, // Câmera traseira
+                        width: { ideal: 1280, min: 640 },
+                        height: { ideal: 720, min: 480 }
+                    },
+                    audio: false
+                };
+
+                // iOS/Safari às vezes precisam de configurações mais específicas
+                const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+                if (isIOS) {
+                    constraints.video = {
+                        ...constraints.video,
+                        facingMode: 'environment', // Remove ideal para iOS
+                        focusMode: 'continuous',
+                        whiteBalanceMode: 'auto'
+                    };
+                }
+
+                videoStream = await navigator.mediaDevices.getUserMedia(constraints);
+                video.srcObject = videoStream;
+                
+                // Aguardar vídeo estar pronto
+                await new Promise(resolve => {
+                    video.onloadedmetadata = () => {
+                        video.play().then(resolve).catch(resolve);
+                    };
                 });
 
-                video.srcObject = videoStream;
-                video.play();
+                // Configurar canvas
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
 
-                // Mostrar container da câmera e esconder botões
+                // Mostrar interface do scanner
                 cameraContainer.style.display = 'block';
                 botoesScanner.style.display = 'none';
                 scannerAtivo = true;
 
-                // Aguardar o vídeo estar pronto
-                video.onloadedmetadata = () => {
-                    canvas.width = video.videoWidth;
-                    canvas.height = video.videoHeight;
-
-                    // Iniciar loop de detecção de QR Code
-                    scannerInterval = setInterval(() => {
-                        if (scannerAtivo && video.readyState === video.HAVE_ENOUGH_DATA) {
-                            // Desenhar frame atual no canvas
-                            context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                            
-                            // Obter dados da imagem
-                            const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-                            
-                            // Tentar detectar QR Code
-                            if (typeof jsQR !== 'undefined') {
-                                const code = jsQR(imageData.data, imageData.width, imageData.height);
-                                
-                                if (code) {
-                                    console.log('QR Code detectado:', code.data);
-                                    
-                                    // Parar scanner e processar QR Code
-                                    pararScanner();
-                                    
-                                    // Preencher campo de texto e validar
-                                    document.getElementById('qrText').value = code.data;
-                                    validarCartela(code.data);
-                                    
-                                    // Feedback visual
-                                    mostrarFeedback('✅ QR Code detectado com sucesso!', 'success');
-                                }
-                            }
-                        }
-                    }, 100); // Verificar a cada 100ms
-                };
+                if (temBarcodeDetector) {
+                    mostrarFeedback('🎯 Scanner nativo ativo! Aponte para o QR Code', 'success');
+                    iniciarDeteccaoNativa(video);
+                } else if (capacidades.jsQR) {
+                    mostrarFeedback('📚 Scanner jsQR ativo! Aponte para o QR Code', 'success');
+                    iniciarDeteccaoJsQR(video, canvas, context);
+                } else {
+                    throw new Error('Nenhuma biblioteca de QR Code disponível');
+                }
 
             } catch (error) {
-                console.error('Erro ao acessar câmera:', error);
-                let mensagem = '';
-                
-                if (error.name === 'NotAllowedError') {
-                    mensagem = '❌ Acesso à câmera negado. Por favor, permita o acesso à câmera e tente novamente.';
-                } else if (error.name === 'NotFoundError') {
-                    mensagem = '❌ Câmera não encontrada. Use "Carregar Imagem" ou cole o texto manualmente.';
-                } else {
-                    mensagem = '❌ Erro ao acessar câmera. Tente "Carregar Imagem" ou cole o texto manualmente.';
+                console.error('Erro ao iniciar scanner:', error);
+                tratarErroScanner(error, cameraContainer, botoesScanner);
+            }
+        }
+
+        // Detecção com BarcodeDetector nativo (mais eficiente)
+        function iniciarDeteccaoNativa(video) {
+            console.log('🎯 Usando BarcodeDetector nativo');
+            
+            scannerInterval = setInterval(async () => {
+                if (!scannerAtivo || video.readyState !== video.HAVE_ENOUGH_DATA) return;
+
+                try {
+                    const barcodes = await barcodeDetector.detect(video);
+                    
+                    if (barcodes.length > 0) {
+                        const qrCode = barcodes[0]; // Pegar primeiro QR Code encontrado
+                        console.log('🎯 QR Code detectado:', qrCode.rawValue);
+                        
+                        processarQRCodeDetectado(qrCode.rawValue, '🎯 QR detectado com API nativa!');
+                    }
+                } catch (error) {
+                    console.error('Erro na detecção nativa:', error);
                 }
+            }, 200); // BarcodeDetector é mais eficiente, pode usar intervalo maior
+        }
+
+        // Detecção com jsQR (fallback)
+        function iniciarDeteccaoJsQR(video, canvas, context) {
+            console.log('📚 Usando jsQR fallback');
+            
+            scannerInterval = setInterval(() => {
+                if (!scannerAtivo || video.readyState !== video.HAVE_ENOUGH_DATA) return;
+
+                try {
+                    // Desenhar frame no canvas
+                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+                    
+                    // Detectar QR Code
+                    const code = jsQR(imageData.data, imageData.width, imageData.height, {
+                        inversionAttempts: "dontInvert" // Otimização para performance
+                    });
+                    
+                    if (code) {
+                        console.log('📚 QR Code detectado:', code.data);
+                        processarQRCodeDetectado(code.data, '📚 QR detectado com jsQR!');
+                    }
+                } catch (error) {
+                    console.error('Erro na detecção jsQR:', error);
+                }
+            }, 100); // jsQR precisa de verificações mais frequentes
+        }
+
+        // Processar QR Code detectado
+        function processarQRCodeDetectado(dadosQR, mensagem) {
+            // Parar scanner
+            pararScanner();
+            
+            // Preencher campo e validar
+            document.getElementById('qrText').value = dadosQR;
+            validarCartela(dadosQR);
+            
+            // Feedback com som
+            mostrarFeedback(mensagem, 'success');
+            
+            // Vibração se disponível
+            if ('vibrate' in navigator) {
+                navigator.vibrate([100, 50, 100]);
+            }
+        }
+
+        // Tratar erros do scanner
+        function tratarErroScanner(error, cameraContainer, botoesScanner) {
+            let mensagem = '';
+            
+            if (error.name === 'NotAllowedError') {
+                mensagem = '❌ Permissão de câmera negada. Permita e tente novamente.';
+            } else if (error.name === 'NotFoundError') {
+                mensagem = '❌ Câmera não encontrada. Use "Carregar Imagem".';
+            } else if (error.name === 'NotSupportedError') {
+                mensagem = '❌ Câmera não suportada. Use "Carregar Imagem".';
+            } else if (error.name === 'OverconstrainedError') {
+                mensagem = '⚠️ Tentando com câmera frontal...';
+                // Tentar com câmera frontal
+                tentarCameraFrontal();
+                return;
+            } else {
+                mensagem = `❌ Erro: ${error.message}. Use "Carregar Imagem".`;
+            }
+            
+            mostrarFeedback(mensagem, 'error');
+            cameraContainer.style.display = 'none';
+            botoesScanner.style.display = 'block';
+        }
+
+        // Fallback para câmera frontal
+        async function tentarCameraFrontal() {
+            try {
+                const video = document.getElementById('cameraVideo');
                 
-                mostrarFeedback(mensagem, 'error');
+                mostrarFeedback('📷 Tentando câmera frontal...', 'info');
                 
-                // Mostrar botões novamente
-                cameraContainer.style.display = 'none';
-                botoesScanner.style.display = 'block';
+                if (videoStream) {
+                    videoStream.getTracks().forEach(track => track.stop());
+                }
+
+                videoStream = await navigator.mediaDevices.getUserMedia({
+                    video: { 
+                        facingMode: 'user', // Câmera frontal
+                        width: 640,
+                        height: 480
+                    }
+                });
+
+                video.srcObject = videoStream;
+                await video.play();
+                
+                const canvas = document.getElementById('qrCanvas');
+                const context = canvas.getContext('2d');
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+
+                scannerAtivo = true;
+                mostrarFeedback('📱 Câmera frontal ativa! Vire o celular para o QR', 'success');
+                
+                // Usar jsQR para câmera frontal (mais compatível)
+                iniciarDeteccaoJsQR(video, canvas, context);
+                
+            } catch (fallbackError) {
+                console.error('Erro na câmera frontal:', fallbackError);
+                tratarErroScanner(fallbackError, 
+                    document.getElementById('cameraContainer'),
+                    document.getElementById('botoesScanner')
+                );
             }
         }
 
