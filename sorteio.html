@@ -1287,6 +1287,84 @@
             inicializar();
             carregarEstadoSorteio();
         });
+        
+        // ==================== SCANNER ESPECIAL IPHONE ====================
+        
+        // Função específica para iPhone - evita transmissão ao vivo
+        function abrirCameraFotoUnica() {
+            console.log('📷 Abrindo câmera para foto única (iPhone)...');
+            mostrarFeedback('📷 Preparando câmera para foto...', 'info');
+            
+            // Criar input file com capture
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.capture = 'environment'; // Câmera traseira
+            input.style.display = 'none';
+            
+            input.addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    console.log('📸 Foto capturada, analisando QR Code...');
+                    mostrarFeedback('📸 Analisando foto para QR Code...', 'info');
+                    lerQRCodeDeImagem(file);
+                } else {
+                    mostrarFeedback('❌ Nenhuma foto selecionada', 'error');
+                }
+                // Limpar
+                document.body.removeChild(input);
+            });
+            
+            // Adicionar ao DOM e disparar
+            document.body.appendChild(input);
+            input.click();
+        }
+        
+        // Função melhorada para detectar iPhone e mostrar opções específicas
+        function modificarTesteParaIPhone() {
+            const isIPhone = /iPhone|iPad|iPod/.test(navigator.userAgent);
+            
+            // Interceptar função original apenas no iPhone
+            if (isIPhone) {
+                const originalTeste = testarCameraSimplesmente;
+                
+                testarCameraSimplesmente = function() {
+                    console.log('📱 iPhone detectado - evitando transmissão ao vivo');
+                    mostrarFeedback('📱 iPhone: Usando método sem transmissão', 'info');
+                    
+                    // Mostrar opções específicas para iPhone
+                    const botoesScanner = document.getElementById('botoesScanner');
+                    botoesScanner.innerHTML = `
+                        <div style="background: #fff3cd; border: 2px solid #ffc107; border-radius: 10px; padding: 15px; text-align: center; margin: 10px 0;">
+                            <h4 style="color: #856404;">📱 Scanner iPhone</h4>
+                            <p style="color: #856404; font-size: 14px;">Método sem transmissão ao vivo:</p>
+                            
+                            <button onclick="abrirCameraFotoUnica()" class="btn" style="background: linear-gradient(135deg, #28a745, #34ce57); margin: 10px 0; width: 100%; padding: 15px; font-size: 16px; font-weight: bold;">
+                                📷 Tirar Foto do QR Code
+                            </button>
+                            
+                            <button onclick="document.getElementById('qrInput').click()" class="btn" style="background: linear-gradient(135deg, #007bff, #0056b3); margin: 5px 0; width: 100%; padding: 12px;">
+                                📁 Escolher da Galeria
+                            </button>
+                            
+                            <button onclick="location.reload()" class="btn" style="background: linear-gradient(135deg, #6c757d, #545b62); margin: 5px 0; width: 100%; padding: 10px;">
+                                🔄 Tentar Outro Método
+                            </button>
+                            
+                            <p style="color: #856404; font-size: 12px; margin-top: 10px;">
+                                💡 "Tirar Foto" não ativa transmissão contínua
+                            </p>
+                        </div>
+                    `;
+                }
+            }
+        }
+        
+        // Executar modificação ao carregar a página
+        document.addEventListener('DOMContentLoaded', function() {
+            modificarTesteParaIPhone();
+        });
+
     </script>
 </body>
 </html>
