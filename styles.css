@@ -73,6 +73,13 @@ header h2 {
     box-shadow: 0 6px 12px rgba(0,0,0,0.2);
 }
 
+.btn-primary:disabled, .btn-secondary:disabled, .btn-tertiary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+}
+
 /* Link para sorteio */
 .sorteio-link {
     text-align: center;
@@ -318,7 +325,7 @@ header h2 {
 @media print {
     @page {
         size: A4;
-        margin: 8mm;
+        margin: 8mm; /* Margem uniforme de 8mm */
     }
     
     * {
@@ -328,76 +335,70 @@ header h2 {
     
     body {
         background: white !important;
-        padding: 0 !important;
+        padding: 0 !important; /* Sem padding já que temos margem da página */
         margin: 0 !important;
         font-family: 'Dancing Script', cursive !important;
     }
     
-    /* Esconder TUDO primeiro */
-    * {
+    /* Esconder TUDO que não seja cartela ou seus elementos */
+    body > *:not(main),
+    main > *:not(#cartelas-container),
+    .no-print,
+    header,
+    .controls,
+    .sorteio-link,
+    .btn-sorteio-link,
+    .sorteio-info,
+    button,
+    input,
+    select,
+    textarea,
+    nav,
+    footer,
+    .mensagem,
+    .mensagem-toast,
+    .cartela-numero {
         display: none !important;
         visibility: hidden !important;
     }
     
-    /* Mostrar APENAS elementos das cartelas */
-    body,
-    .cartelas-grid,
-    .cartela,
-    .cartela-header,
-    .cartela-decoracao,
-    .cartela-titulo,
-    .cartela-subtitulo,
-    .estrela,
-    .coracao,
-    .bingo-grid,
-    .bingo-cell {
+    /* Garantir que apenas cartelas-container seja visível em main */
+    main {
         display: block !important;
-        visibility: visible !important;
+        padding: 0 !important;
+        margin: 0 !important;
     }
     
-    /* Corrigir display específicos */
-    .cartelas-grid {
+    #cartelas-container.cartelas-grid {
         display: grid !important;
-    }
-    
-    .bingo-grid {
-        display: grid !important;
-    }
-    
-    .bingo-cell {
-        display: flex !important;
-    }
-    
-    .cartela-decoracao {
-        display: flex !important;
-    }
-    
-    .cartelas-grid {
-        display: grid !important;
-        grid-template-columns: repeat(2, 1fr);
-        grid-template-rows: repeat(2, 1fr);
-        gap: 4mm;
+        grid-template-columns: repeat(2, 1fr) !important;
+        grid-template-rows: repeat(2, 1fr) !important;
+        gap: 3mm !important; /* Gap menor para otimizar espaço */
         padding: 0 !important;
         margin: 0 !important;
         width: 100% !important;
-        height: 100vh !important;
-        box-sizing: border-box;
+        height: 100% !important;
+        box-sizing: border-box !important;
     }
     
     .cartela {
-        width: 90mm !important; /* Otimizado para A4: 210mm - 16mm margin - 6mm gap = ~94mm / 2 = ~90mm */
-        height: 128mm !important; /* Otimizado para A4: 297mm - 16mm margin - 6mm gap = ~138mm / 2 = ~128mm */
-        padding: 3mm !important;
+        /* Cálculo preciso para A4: (210mm - 16mm margin - 3mm gap) ÷ 2 = 95.5mm */
+        width: 95.5mm !important;
+        /* Cálculo preciso para A4: (297mm - 16mm margin - 3mm gap) ÷ 2 = 139mm */
+        height: 139mm !important;
+        padding: 2.5mm !important;
         margin: 0 !important;
         background: #fef7f7 !important;
-        border: 1mm solid #e91e63 !important;
-        border-radius: 3mm !important;
+        border: 0.5mm solid #e91e63 !important;
+        border-radius: 1.5mm !important;
         box-shadow: none !important;
         page-break-inside: avoid !important;
         transform: none !important;
         position: relative !important;
         box-sizing: border-box !important;
         overflow: hidden !important;
+        display: flex !important;
+        flex-direction: column !important;
     }
     
     /* Quebrar página a cada 4 cartelas */
@@ -411,26 +412,28 @@ header h2 {
     
     .cartela-header {
         height: 12mm !important;
-        margin-bottom: 2mm !important;
+        margin-bottom: 1.5mm !important;
     }
     
     .cartela-decoracao {
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        gap: 2mm !important;
+        gap: 1mm !important;
     }
     
     .cartela-titulo {
         font-size: 3mm !important;
         font-weight: 700 !important;
         text-align: center !important;
+        line-height: 1.1 !important;
     }
     
     .cartela-subtitulo {
         font-size: 4mm !important;
         font-weight: 900 !important;
         text-align: center !important;
+        line-height: 1.1 !important;
     }
     
     .estrela, .coracao {
@@ -438,7 +441,7 @@ header h2 {
     }
     
     .bingo-grid {
-        height: 100mm !important;
+        height: 120mm !important; /* Altura ajustada para caber perfeitamente */
         gap: 0.3mm !important;
         border: 0.8mm solid #e91e63 !important;
         display: grid !important;
@@ -447,15 +450,15 @@ header h2 {
     }
     
     .bingo-cell {
-        font-size: 1.8mm !important;
+        font-size: 2mm !important; /* Fonte maior para melhor legibilidade */
         border: 0.3mm solid #e91e63 !important;
         padding: 0.5mm !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
         text-align: center !important;
-        line-height: 1.0 !important;
-        font-weight: 500 !important;
+        line-height: 1.1 !important;
+        font-weight: 600 !important;
         word-wrap: break-word !important;
         overflow: hidden !important;
     }
@@ -515,7 +518,7 @@ header h2 {
     .bingo-cell:nth-child(13) {
         background: #fce4ec !important;
         color: #e91e63 !important;
-        font-size: 2.2mm !important;
+        font-size: 2.5mm !important;
         font-weight: 900 !important;
     }
 }

@@ -5,23 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gerador de Cartelas de Bingo - Chá de Panela da Mari</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- Bibliotecas para geração de PDF - versões estáveis -->
+    <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script src="https://unpkg.com/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 </head>
 <body>
-    <header>
+    <header class="no-print">
         <h1>🎉 Gerador de Cartelas de Bingo 🎉</h1>
         <h2>Chá de Panela da Mari</h2>
     </header>
 
     <main>
-        <div class="controls">
+        <div class="controls no-print">
             <button id="gerarCartelas" class="btn-primary">Gerar 35 Cartelas</button>
-            <button id="imprimirCartelas" class="btn-secondary">Imprimir (4 por página)</button>
-            <button id="novasCartelas" class="btn-tertiary">Gerar Novas Cartelas</button>
+            <button id="gerarPDF" class="btn-secondary">📄 PDF Automático (Melhor Qualidade)</button>
+            <button id="gerarPDFDireto" class="btn-secondary">📄 PDF Compatibilidade</button>
+            <button id="imprimirCartelas" class="btn-tertiary">🖨️ Imprimir Navegador</button>
+            <button id="novasCartelas" class="btn-tertiary">🔄 Gerar Novas Cartelas</button>
+            <button id="testarCaptura" class="btn-tertiary" style="font-size: 0.8rem;">🔧 Testar Captura</button>
         </div>
         
-        <div class="sorteio-link">
-            <a href="sorteio.html" class="btn-sorteio-link" target="_blank">
+        <div class="sorteio-link no-print">
+            <a href="sorteio.html" class="btn-sorteio-link" onclick="window.open('sorteio.html', '_blank', 'width=800,height=600'); return false;">
                 📱 Abrir Sorteio no Celular
             </a>
             <p class="sorteio-info">Use o sorteio separadamente no celular durante o evento!</p>

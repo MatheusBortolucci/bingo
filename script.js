@@ -120,12 +120,30 @@ function gerarTodasCartelas() {
         
         console.log('Todas as cartelas foram geradas');
         
-        // Habilitar botão de impressão
+        // Habilitar botões
+        const botaoGerarPDF = document.getElementById('gerarPDF');
+        const botaoGerarPDFDireto = document.getElementById('gerarPDFDireto');
         const botaoImprimir = document.getElementById('imprimirCartelas');
+        const botaoTeste = document.getElementById('testarCaptura');
+        
+        if (botaoGerarPDF) {
+            botaoGerarPDF.disabled = false;
+            console.log('Botão de gerar PDF habilitado');
+        }
+        
+        if (botaoGerarPDFDireto) {
+            botaoGerarPDFDireto.disabled = false;
+            console.log('Botão de gerar PDF direto habilitado');
+        }
         
         if (botaoImprimir) {
             botaoImprimir.disabled = false;
             console.log('Botão de impressão habilitado');
+        }
+        
+        if (botaoTeste) {
+            botaoTeste.disabled = false;
+            console.log('Botão de teste habilitado');
         }
         
         // Scroll suave para as cartelas
@@ -134,6 +152,464 @@ function gerarTodasCartelas() {
         // Mostrar mensagem de sucesso
         mostrarMensagem('✅ 35 cartelas geradas com sucesso!', 'success');
     }, 500);
+}
+
+// Função para gerar PDF profissional com 4 cartelas por página
+async function gerarPDFProfissional() {
+    const cartelas = document.querySelectorAll('.cartela');
+    if (cartelas.length === 0) {
+        mostrarMensagem('⚠️ Gere as cartelas primeiro!', 'warning');
+        return;
+    }
+    
+    mostrarMensagem('📄 Preparando PDF... Aguarde!', 'info');
+    
+    // Primeiro tentar método com html2canvas
+    if (typeof html2canvas !== 'undefined' && typeof window.jspdf !== 'undefined') {
+        try {
+            await gerarPDFComImagem();
+            return;
+        } catch (error) {
+            console.log('Método com imagem falhou, usando método direto...');
+            mostrarMensagem('📄 Tentando método alternativo...', 'info');
+        }
+    }
+    
+    // Fallback para método direto
+    gerarPDFDireto();
+}
+
+// Função para gerar PDF com captura de imagem (método preferido)
+async function gerarPDFComImagem() {
+    const cartelas = document.querySelectorAll('.cartela');
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    
+    // Dimensões A4
+    const pageWidth = 210;
+    const pageHeight = 297;
+    const margin = 8;
+    const gap = 3;
+    const cartelaWidth = (pageWidth - 2 * margin - gap) / 2;
+    const cartelaHeight = (pageHeight - 2 * margin - gap) / 2;
+    
+    let paginaAtual = 0;
+    let cartelasPorPagina = 0;
+    
+    for (let i = 0; i < cartelas.length; i++) {
+        // Nova página a cada 4 cartelas
+        if (cartelasPorPagina === 0) {
+            if (paginaAtual > 0) {
+                pdf.addPage();
+            }
+            paginaAtual++;
+        }
+        
+        const cartela = cartelas[i];
+        
+        // Calcular posição
+        const coluna = cartelasPorPagina % 2;
+        const linha = Math.floor(cartelasPorPagina / 2);
+        const x = margin + coluna * (cartelaWidth + gap);
+        const y = margin + linha * (cartelaHeight + gap);
+        
+        // Aguardar renderização
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        // Capturar com configurações otimizadas
+        const canvas = await html2canvas(cartela, {
+            scale: 2.5, // Alta qualidade
+            backgroundColor: '#fef7f7',
+            useCORS: true,
+            allowTaint: true,
+            logging: false,
+            width: cartela.offsetWidth,
+            height: cartela.offsetHeight,
+            onclone: (clonedDoc) => {
+                // Aplicar estilos para garantir renderização correta
+                const clonedCartela = clonedDoc.querySelector('.cartela');
+                if (clonedCartela) {
+                    clonedCartela.style.transform = 'none';
+                    clonedCartela.style.webkitTransform = 'none';
+                }
+            }
+        });
+        
+        // Verificar se canvas é válido
+        if (canvas.width === 0 || canvas.height === 0) {
+            throw new Error(`Canvas vazio para cartela ${i + 1}`);
+        }
+        
+        const imgData = canvas.toDataURL('image/jpeg', 0.95);
+        
+        if (imgData === 'data:,' || imgData === '') {
+            throw new Error(`Imagem vazia para cartela ${i + 1}`);
+        }
+        
+        // Adicionar ao PDF
+        pdf.addImage(imgData, 'JPEG', x, y, cartelaWidth, cartelaHeight);
+        
+        cartelasPorPagina = (cartelasPorPagina + 1) % 4;
+        
+        // Progresso
+        const progresso = Math.round(((i + 1) / cartelas.length) * 100);
+        mostrarMensagem(`📄 Gerando PDF de alta qualidade... ${progresso}%`, 'info');
+    }
+    
+    // Salvar
+    const dataAtual = new Date().toLocaleDateString('pt-BR').replace(/\//g, '-');
+    const nomeArquivo = `Bingo_Cha_de_Panela_Mari_HD_${dataAtual}.pdf`;
+    
+    pdf.save(nomeArquivo);
+    mostrarMensagem('✅ PDF de alta qualidade gerado com sucesso!', 'success');
+}
+
+// Método alternativo para gerar PDF
+async function gerarPDFAlternativo() {
+    try {
+        mostrarMensagem('📄 Tentando método alternativo...', 'info');
+        
+        const container = document.getElementById('cartelas-container');
+        
+        // Scroll para o topo para garantir visibilidade
+        window.scrollTo(0, 0);
+        container.scrollIntoView();
+        
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Usar html2canvas no container inteiro
+        const canvas = await html2canvas(container, {
+            scale: 1.5,
+            backgroundColor: '#ffffff',
+            useCORS: true,
+            allowTaint: true,
+            logging: true,
+            scrollX: 0,
+            scrollY: 0
+        });
+        
+        if (canvas.width === 0 || canvas.height === 0) {
+            throw new Error('Canvas vazio no método alternativo');
+        }
+        
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        
+        const imgWidth = 210 - 16; // A4 width minus margins
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        
+        const imgData = canvas.toDataURL('image/jpeg', 0.8);
+        pdf.addImage(imgData, 'JPEG', 8, 8, imgWidth, imgHeight);
+        
+        const dataAtual = new Date().toLocaleDateString('pt-BR').replace(/\//g, '-');
+        pdf.save(`Bingo_Alternativo_${dataAtual}.pdf`);
+        
+        mostrarMensagem('✅ PDF alternativo gerado!', 'success');
+        
+    } catch (error) {
+        console.error('Erro no método alternativo:', error);
+        mostrarMensagem('❌ Use o botão "Imprimir Navegador" e salve como PDF', 'warning');
+    }
+}
+
+// Versão simplificada para debug
+async function testarCaptura() {
+    const cartela = document.querySelector('.cartela');
+    if (!cartela) {
+        mostrarMensagem('❌ Nenhuma cartela encontrada', 'warning');
+        return;
+    }
+    
+    try {
+        console.log('Testando captura da primeira cartela...');
+        console.log('html2canvas disponível?', typeof html2canvas);
+        
+        if (typeof html2canvas === 'undefined') {
+            throw new Error('html2canvas não carregou corretamente');
+        }
+        
+        const canvas = await html2canvas(cartela, {
+            scale: 1,
+            backgroundColor: '#ffffff',
+            logging: true,
+            useCORS: true,
+            allowTaint: true
+        });
+        
+        console.log('Canvas criado:', canvas.width, 'x', canvas.height);
+        
+        if (canvas.width > 0 && canvas.height > 0) {
+            // Mostrar o canvas na tela para debug
+            const newWindow = window.open('', '_blank');
+            if (newWindow) {
+                newWindow.document.body.appendChild(canvas);
+                mostrarMensagem('✅ Captura funcionando! Veja a nova janela.', 'success');
+            } else {
+                // Se não conseguir abrir janela, usar dataURL
+                const dataURL = canvas.toDataURL('image/png');
+                console.log('Data URL length:', dataURL.length);
+                mostrarMensagem('✅ Captura funcionando! Veja no console.', 'success');
+            }
+        } else {
+            mostrarMensagem('❌ Canvas vazio', 'warning');
+        }
+        
+    } catch (error) {
+        console.error('Erro no teste:', error);
+        mostrarMensagem('❌ Erro na captura: ' + error.message, 'warning');
+        
+        // Tentar abordagem alternativa
+        setTimeout(() => {
+            testarSemHtml2Canvas();
+        }, 1000);
+    }
+}
+
+// Função alternativa sem html2canvas
+function testarSemHtml2Canvas() {
+    mostrarMensagem('🔄 Tentando método sem html2canvas...', 'info');
+    
+    try {
+        // Usar SVG para capturar o conteúdo
+        const cartela = document.querySelector('.cartela');
+        if (!cartela) {
+            mostrarMensagem('❌ Cartela não encontrada', 'warning');
+            return;
+        }
+        
+        // Criar representação SVG do conteúdo
+        const svgContent = criarSVGDaCartela(cartela);
+        
+        if (svgContent) {
+            // Criar PDF diretamente
+            gerarPDFDireto();
+        } else {
+            mostrarMensagem('❌ Não foi possível processar a cartela', 'warning');
+        }
+        
+    } catch (error) {
+        console.error('Erro no método alternativo:', error);
+        mostrarMensagem('❌ Use "Imprimir Navegador" como alternativa', 'warning');
+    }
+}
+
+// Função para criar PDF diretamente sem captura de imagem
+function gerarPDFDireto() {
+    const cartelas = document.querySelectorAll('.cartela');
+    if (cartelas.length === 0) {
+        mostrarMensagem('⚠️ Gere as cartelas primeiro!', 'warning');
+        return;
+    }
+    
+    mostrarMensagem('📄 Gerando PDF de alta qualidade (método direto)...', 'info');
+    
+    try {
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        
+        let paginaAtual = 0;
+        let cartelasPorPagina = 0;
+        
+        // Dimensões otimizadas para 4 cartelas por página
+        const margin = 8;
+        const gap = 3;
+        const cartelaWidth = (210 - 2 * margin - gap) / 2; // ~95mm
+        const cartelaHeight = (297 - 2 * margin - gap) / 2; // ~139mm
+        
+        cartelas.forEach((cartela, index) => {
+            // Nova página a cada 4 cartelas
+            if (cartelasPorPagina === 0) {
+                if (paginaAtual > 0) {
+                    pdf.addPage();
+                }
+                paginaAtual++;
+            }
+            
+            // Calcular posição da cartela na página (2x2 grid)
+            const coluna = cartelasPorPagina % 2;
+            const linha = Math.floor(cartelasPorPagina / 2);
+            const x = margin + coluna * (cartelaWidth + gap);
+            const y = margin + linha * (cartelaHeight + gap);
+            
+            // Desenhar cartela com qualidade melhorada
+            desenharCartelaNoPDF(pdf, cartela, x, y, cartelaWidth, cartelaHeight);
+            
+            cartelasPorPagina = (cartelasPorPagina + 1) % 4;
+            
+            // Mostrar progresso
+            const progresso = Math.round(((index + 1) / cartelas.length) * 100);
+            if (index % 5 === 0 || index === cartelas.length - 1) {
+                mostrarMensagem(`📄 Criando PDF profissional... ${progresso}%`, 'info');
+            }
+        });
+        
+        // Salvar PDF com nome descritivo
+        const dataAtual = new Date().toLocaleDateString('pt-BR').replace(/\//g, '-');
+        const nomeArquivo = `Bingo_Cha_de_Panela_Mari_QUALIDADE_${dataAtual}.pdf`;
+        
+        pdf.save(nomeArquivo);
+        mostrarMensagem('✅ PDF de alta qualidade gerado com sucesso!', 'success');
+        
+    } catch (error) {
+        console.error('Erro ao gerar PDF direto:', error);
+        mostrarMensagem('❌ Erro no PDF direto. Use impressão do navegador.', 'warning');
+    }
+}
+
+// Função para desenhar cartela diretamente no PDF
+function desenharCartelaNoPDF(pdf, cartela, x, y, width, height) {
+    // Desenhar borda da cartela com borda arredondada simulada
+    pdf.setFillColor(254, 247, 247); // Rosa bem clarinho
+    pdf.rect(x, y, width, height, 'F');
+    
+    pdf.setDrawColor(233, 30, 99);
+    pdf.setLineWidth(0.8);
+    pdf.rect(x, y, width, height);
+    
+    // Título da cartela - melhor formatação
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(10);
+    pdf.setTextColor(216, 27, 96); // Rosa escuro
+    pdf.text('CHÁS DE PANELA DA MARI', x + width/2, y + 10, { align: 'center' });
+    
+    pdf.setFontSize(14);
+    pdf.setTextColor(51, 51, 51); // Cinza escuro
+    pdf.text('BINGO', x + width/2, y + 20, { align: 'center' });
+    
+    // Decoração com estrelas
+    pdf.setFontSize(12);
+    pdf.setTextColor(233, 30, 99);
+    pdf.text('★', x + 8, y + 15);
+    pdf.text('★', x + width - 8, y + 15);
+    
+    // Grid 5x5 melhorado
+    const gridStartY = y + 25;
+    const gridHeight = height - 30;
+    const cellWidth = width / 5;
+    const cellHeight = gridHeight / 5;
+    
+    // Pegar conteúdo das células
+    const cells = cartela.querySelectorAll('.bingo-cell');
+    
+    cells.forEach((cell, index) => {
+        const row = Math.floor(index / 5);
+        const col = index % 5;
+        const cellX = x + col * cellWidth;
+        const cellY = gridStartY + row * cellHeight;
+        
+        // Aplicar padrão xadrez correto baseado no CSS original
+        let isRed = false;
+        
+        // Lógica do padrão xadrez do CSS original
+        if (row === 0) { // Primeira linha: rosa, vermelho, rosa, vermelho, rosa
+            isRed = (col === 1 || col === 3);
+        } else if (row === 1) { // Segunda linha: vermelho, rosa, vermelho, rosa, vermelho
+            isRed = (col === 0 || col === 2 || col === 4);
+        } else if (row === 2) { // Terceira linha: rosa, vermelho, rosa (centro), vermelho, rosa
+            isRed = (col === 1 || col === 3);
+        } else if (row === 3) { // Quarta linha: vermelho, rosa, vermelho, rosa, vermelho
+            isRed = (col === 0 || col === 2 || col === 4);
+        } else if (row === 4) { // Quinta linha: rosa, vermelho, rosa, vermelho, rosa
+            isRed = (col === 1 || col === 3);
+        }
+        
+        // Aplicar cores
+        if (isRed) {
+            pdf.setFillColor(233, 30, 99); // Vermelho/Pink
+            pdf.rect(cellX, cellY, cellWidth, cellHeight, 'F');
+            pdf.setTextColor(255, 255, 255); // Texto branco
+            pdf.setFont('helvetica', 'bold');
+        } else {
+            pdf.setFillColor(252, 228, 236); // Rosa claro
+            pdf.rect(cellX, cellY, cellWidth, cellHeight, 'F');
+            pdf.setTextColor(51, 51, 51); // Texto escuro
+            pdf.setFont('helvetica', 'normal');
+        }
+        
+        // Borda da célula
+        pdf.setDrawColor(233, 30, 99);
+        pdf.setLineWidth(0.3);
+        pdf.rect(cellX, cellY, cellWidth, cellHeight);
+        
+        // Conteúdo da célula
+        let texto = cell.textContent.trim();
+        
+        if (index === 12) { // Centro - coração
+            pdf.setFontSize(16);
+            pdf.setTextColor(233, 30, 99);
+            pdf.setFont('helvetica', 'bold');
+            // Usar símbolo de coração disponível
+            pdf.text('♥', cellX + cellWidth/2, cellY + cellHeight/2 + 3, { 
+                align: 'center'
+            });
+        } else if (texto && texto.length > 0) {
+            // Configurar fonte para texto normal
+            pdf.setFontSize(8);
+            
+            // Ajustar quebra de texto melhor
+            const maxWidth = cellWidth - 4;
+            let linhas = [];
+            
+            // Quebrar texto em palavras
+            const palavras = texto.split(' ');
+            let linhaAtual = '';
+            
+            palavras.forEach(palavra => {
+                const testeLinha = linhaAtual ? linhaAtual + ' ' + palavra : palavra;
+                const larguraTeste = pdf.getTextWidth(testeLinha);
+                
+                if (larguraTeste <= maxWidth) {
+                    linhaAtual = testeLinha;
+                } else {
+                    if (linhaAtual) {
+                        linhas.push(linhaAtual);
+                        linhaAtual = palavra;
+                    } else {
+                        // Palavra muito longa - forçar quebra
+                        linhas.push(palavra);
+                    }
+                }
+            });
+            
+            if (linhaAtual) {
+                linhas.push(linhaAtual);
+            }
+            
+            // Limitar a 3 linhas
+            if (linhas.length > 3) {
+                linhas = linhas.slice(0, 2);
+                linhas.push(linhas[1].substring(0, Math.min(linhas[1].length, 8)) + '...');
+            }
+            
+            // Centralizar verticalmente
+            const alturaTexto = linhas.length * 3;
+            const startY = cellY + cellHeight/2 - alturaTexto/2 + 2;
+            
+            linhas.forEach((linha, lineIndex) => {
+                pdf.text(linha, cellX + cellWidth/2, startY + (lineIndex * 3), { 
+                    align: 'center'
+                });
+            });
+        }
+    });
+    
+    // Número da cartela no canto superior direito
+    const numeroElement = cartela.querySelector('.cartela-numero');
+    if (numeroElement) {
+        const numero = numeroElement.textContent.trim();
+        pdf.setFillColor(233, 30, 99);
+        pdf.roundedRect(x + width - 20, y + 2, 15, 8, 2, 2, 'F');
+        pdf.setTextColor(255, 255, 255);
+        pdf.setFontSize(8);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text(numero, x + width - 12.5, y + 8, { align: 'center' });
+    }
+}
+
+// Função placeholder para SVG (caso precise depois)
+function criarSVGDaCartela(cartela) {
+    // Implementação futura se necessário
+    return true;
 }
 
 // Função para gerar PDF sem cortes
@@ -287,12 +763,21 @@ function mostrarMensagem(texto, tipo) {
 // Função para verificar se as cartelas já foram geradas
 function verificarCartelas() {
     const cartelas = document.querySelectorAll('.cartela');
+    const botaoGerarPDF = document.getElementById('gerarPDF');
+    const botaoGerarPDFDireto = document.getElementById('gerarPDFDireto');
     const botaoImprimir = document.getElementById('imprimirCartelas');
+    const botaoTeste = document.getElementById('testarCaptura');
     
     if (cartelas.length > 0) {
+        if (botaoGerarPDF) botaoGerarPDF.disabled = false;
+        if (botaoGerarPDFDireto) botaoGerarPDFDireto.disabled = false;
         if (botaoImprimir) botaoImprimir.disabled = false;
+        if (botaoTeste) botaoTeste.disabled = false;
     } else {
+        if (botaoGerarPDF) botaoGerarPDF.disabled = true;
+        if (botaoGerarPDFDireto) botaoGerarPDFDireto.disabled = true;
         if (botaoImprimir) botaoImprimir.disabled = true;
+        if (botaoTeste) botaoTeste.disabled = true;
     }
 }
 
@@ -301,22 +786,45 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM carregado, configurando event listeners...');
     
     const botaoGerar = document.getElementById('gerarCartelas');
+    const botaoGerarPDF = document.getElementById('gerarPDF');
+    const botaoGerarPDFDireto = document.getElementById('gerarPDFDireto');
     const botaoImprimir = document.getElementById('imprimirCartelas');
     const botaoNovas = document.getElementById('novasCartelas');
+    const botaoTeste = document.getElementById('testarCaptura');
     
     console.log('Botões encontrados:', {
         gerar: !!botaoGerar,
+        gerarPDF: !!botaoGerarPDF,
+        gerarPDFDireto: !!botaoGerarPDFDireto,
         imprimir: !!botaoImprimir,
-        novas: !!botaoNovas
+        novas: !!botaoNovas,
+        teste: !!botaoTeste
     });
     
-    // Inicialmente desabilitar botão de impressão
+    // Inicialmente desabilitar botões que dependem das cartelas
+    if (botaoGerarPDF) botaoGerarPDF.disabled = true;
+    if (botaoGerarPDFDireto) botaoGerarPDFDireto.disabled = true;
     if (botaoImprimir) botaoImprimir.disabled = true;
+    if (botaoTeste) botaoTeste.disabled = true;
     
     if (botaoGerar) {
         botaoGerar.addEventListener('click', function() {
             console.log('Botão Gerar Cartelas clicado!');
             gerarTodasCartelas();
+        });
+    }
+    
+    if (botaoGerarPDF) {
+        botaoGerarPDF.addEventListener('click', function() {
+            console.log('Botão Gerar PDF clicado!');
+            gerarPDFProfissional();
+        });
+    }
+    
+    if (botaoGerarPDFDireto) {
+        botaoGerarPDFDireto.addEventListener('click', function() {
+            console.log('Botão Gerar PDF Direto clicado!');
+            gerarPDFDireto();
         });
     }
     
@@ -328,6 +836,13 @@ document.addEventListener('DOMContentLoaded', function() {
         botaoNovas.addEventListener('click', function() {
             console.log('Botão Novas Cartelas clicado!');
             gerarTodasCartelas();
+        });
+    }
+    
+    if (botaoTeste) {
+        botaoTeste.addEventListener('click', function() {
+            console.log('Botão Testar Captura clicado!');
+            testarCaptura();
         });
     }
     
