@@ -633,14 +633,19 @@
             try {
                 console.log('🔍 Validando cartela:', dadosQR);
                 
-                // SIMPLESMENTE EXTRAIR AS PALAVRAS DO QR CODE
-                const itensCartela = JSON.parse(dadosQR);
+                // EXTRAIR AS CHAVES DO QR CODE
+                const chavesCartela = JSON.parse(dadosQR);
                 
-                // VERIFICAR SE É UM ARRAY DE PALAVRAS
-                if (!Array.isArray(itensCartela) || itensCartela.length === 0) {
-                    throw new Error('QR Code não contém lista de palavras válida');
+                // VERIFICAR SE É UM ARRAY DE CHAVES
+                if (!Array.isArray(chavesCartela) || chavesCartela.length === 0) {
+                    throw new Error('QR Code não contém lista de chaves válida');
                 }
 
+                console.log(`🔑 Chaves da cartela: ${chavesCartela.join(', ')}`);
+
+                // CONVERTER CHAVES PARA PALAVRAS
+                const itensCartela = chavesCartela.map(chave => itensMap[chave]).filter(item => item);
+                
                 console.log(`📝 Palavras da cartela: ${itensCartela.join(', ')}`);
 
                 // VERIFICAR QUAIS PALAVRAS DA CARTELA AINDA NÃO FORAM SORTEADAS
