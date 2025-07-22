@@ -51,6 +51,9 @@ function gerarCartela(numeroCartela) {
     const cartela = document.createElement('div');
     cartela.className = 'cartela';
     
+    // Gerar dados para QR Code
+    const dadosQR = gerarDadosQRCode(numeroCartela, itensCartela);
+    
     cartela.innerHTML = `
         <div class="cartela-numero">Cartela ${numeroCartela}</div>
         <div class="cartela-header">
@@ -67,10 +70,79 @@ function gerarCartela(numeroCartela) {
         <div class="bingo-grid">
             ${gerarCelulas(itensCartela)}
         </div>
+        <div class="qr-container">
+            <div class="qr-code" id="qr-${numeroCartela}"></div>
+            <div class="qr-label">📱 QR para validação</div>
+        </div>
     `;
+    
+    // Gerar QR Code após adicionar ao DOM
+    setTimeout(() => {
+        gerarQRCode(numeroCartela, dadosQR);
+    }, 100);
     
     console.log(`Cartela ${numeroCartela} criada com sucesso`);
     return cartela;
+}
+
+// Função para gerar dados do QR Code
+function gerarDadosQRCode(numeroCartela, itensCartela) {
+    // Criar hash para verificar integridade
+    const hash = gerarHashCartela(numeroCartela, itensCartela);
+    
+    const dados = {
+        numero: numeroCartela,
+        itens: itensCartela,
+        hash: hash,
+        evento: "Chá de Panela da Mari",
+        timestamp: new Date().toISOString()
+    };
+    
+    return JSON.stringify(dados);
+}
+
+// Função para gerar hash da cartela
+function gerarHashCartela(numero, itens) {
+    const dados = `${numero}-${itens.sort().join(',')}`;
+    let hash = 0;
+    for (let i = 0; i < dados.length; i++) {
+        const char = dados.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash; // Converter para 32bit integer
+    }
+    return hash.toString();
+}
+
+// Função para gerar QR Code visual
+async function gerarQRCode(numeroCartela, dadosQR) {
+    const elemento = document.getElementById(`qr-${numeroCartela}`);
+    if (elemento && typeof QRCode !== 'undefined') {
+        try {
+            // Criar um canvas pequeno para o QR Code
+            const canvas = document.createElement('canvas');
+            await QRCode.toCanvas(canvas, dadosQR, {
+                width: 80,
+                margin: 1,
+                color: {
+                    dark: '#e91e63',  // Rosa escuro
+                    light: '#ffffff'  // Fundo branco
+                }
+            });
+            
+            // Adicionar o canvas ao elemento
+            elemento.appendChild(canvas);
+            console.log(`QR Code gerado para cartela ${numeroCartela}`);
+        } catch (error) {
+            console.error(`Erro ao gerar QR Code para cartela ${numeroCartela}:`, error);
+            // Fallback: mostrar apenas o texto
+            elemento.innerHTML = '<div style="font-size: 0.6rem; color: #e91e63;">QR Code</div>';
+        }
+    } else {
+        console.warn('Biblioteca QRCode não disponível ou elemento não encontrado');
+        if (elemento) {
+            elemento.innerHTML = '<div style="font-size: 0.6rem; color: #e91e63;">QR Code</div>';
+        }
+    }
 }
 
 // Função para gerar as células da cartela (5x5)

@@ -321,6 +321,40 @@ header h2 {
     font-weight: bold;
 }
 
+/* QR Code Container */
+.qr-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 10px;
+    padding: 8px;
+}
+
+.qr-code {
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    border: 2px solid #e91e63;
+    border-radius: 8px;
+    margin-bottom: 5px;
+}
+
+.qr-code canvas {
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 4px;
+}
+
+.qr-label {
+    font-size: 0.7rem;
+    color: #e91e63;
+    text-align: center;
+    font-weight: bold;
+}
+
 /* Estilos para impressão - 4 cartelas por página */
 @media print {
     @page {
@@ -520,6 +554,40 @@ header h2 {
         color: #e91e63 !important;
         font-size: 2.5mm !important;
         font-weight: 900 !important;
+    }
+    
+    /* QR Code na impressão */
+    .qr-container {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: center !important;
+        margin-top: 1mm !important;
+        padding: 1mm !important;
+        height: 8mm !important;
+    }
+    
+    .qr-code {
+        width: 6mm !important;
+        height: 6mm !important;
+        border: 0.2mm solid #e91e63 !important;
+        border-radius: 0.5mm !important;
+        background: white !important;
+        margin-right: 1mm !important;
+    }
+    
+    .qr-code canvas {
+        width: 100% !important;
+        height: 100% !important;
+        max-width: 6mm !important;
+        max-height: 6mm !important;
+        border-radius: 0.3mm !important;
+    }
+    
+    .qr-label {
+        font-size: 1.5mm !important;
+        color: #e91e63 !important;
+        font-weight: 600 !important;
     }
 }
 
