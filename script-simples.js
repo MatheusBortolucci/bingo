@@ -97,27 +97,26 @@ function gerarQRCodeMini(numeroCartela, dadosQR) {
 
     elemento.innerHTML = '';
     
+    // Usar exatamente o mesmo método do teste que funciona
     if (typeof QRCode !== 'undefined') {
         try {
             new QRCode(elemento, {
                 text: dadosQR,
                 width: 50,
                 height: 50,
-                colorDark: '#000000',
+                colorDark: '#000000',  // COR PRETA COMO SOLICITADO
                 colorLight: '#ffffff',
                 correctLevel: QRCode.CorrectLevel.M
             });
+            return;
         } catch(error) {
-            tentarMetodoAPI(elemento, dadosQR);
+            console.error('❌ Erro com qrcode.js cartela:', error);
         }
-    } else {
-        tentarMetodoAPI(elemento, dadosQR);
     }
-}
-
-function tentarMetodoAPI(elemento, dadosQR) {
-    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=50x50&data=${encodeURIComponent(dadosQR)}`;
-    elemento.innerHTML = `<img src="${qrUrl}" alt="QR Code" style="width: 50px; height: 50px;">`;
+    
+    // Método API com cor preta
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=50x50&data=${encodeURIComponent(dadosQR)}&color=000000&bgcolor=ffffff`;
+    elemento.innerHTML = `<img src="${qrUrl}" alt="QR Code" style="width: 50px; height: 50px; image-rendering: crisp-edges;">`;
 }
 
 function gerarCelulas(itens, numeroCartela) {
@@ -231,3 +230,33 @@ function imprimirCartelas() {
         }, 1000);
     }, 200);
 }
+
+// Event Listeners para os botões
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🎲 Script Simples carregado!');
+    
+    // Botão principal para gerar cartelas
+    const botaoGerarCartelas = document.getElementById('gerarCartelas');
+    if (botaoGerarCartelas) {
+        botaoGerarCartelas.addEventListener('click', gerarTodasCartelas);
+    }
+    
+    // Botão para gerar novas cartelas
+    const botaoNovasCartelas = document.getElementById('novasCartelas');
+    if (botaoNovasCartelas) {
+        botaoNovasCartelas.addEventListener('click', gerarTodasCartelas);
+    }
+    
+    // Botão de imprimir
+    const botaoImprimir = document.getElementById('imprimirCartelas');
+    if (botaoImprimir) {
+        botaoImprimir.addEventListener('click', imprimirCartelas);
+    }
+    
+    // Desabilitar botões até as cartelas serem geradas
+    const botoesParaDesabilitar = ['gerarPDF', 'gerarPDFDireto', 'imprimirCartelas'];
+    botoesParaDesabilitar.forEach(id => {
+        const botao = document.getElementById(id);
+        if (botao) botao.disabled = true;
+    });
+});

@@ -1331,17 +1331,17 @@
         function gerarQRCodeTeste() {
             console.log('🧪 Gerando QR Code de teste...');
             
-            // Dados de teste compatíveis com o formato das cartelas reais
-            const dadosTeste = {
+            // TESTE: Gerar QR Code com dados iguais aos das cartelas
+            const dadosCartelaSimulada = {
                 numero: 999,
                 evento: 'Chá de Panela da Mari',
                 timestamp: new Date().toISOString(),
-                itens: ['Panela', 'Colher', 'Garfo', 'Faca'], // Alguns itens de teste
+                itens: ['Panela', 'Colher', 'Garfo', 'Faca'],
                 hash: 'teste123'
             };
             
-            const jsonTeste = JSON.stringify(dadosTeste);
-            console.log('🧪 Dados do QR de teste:', jsonTeste);
+            const jsonTeste = JSON.stringify(dadosCartelaSimulada);
+            console.log('🧪 Dados do QR de teste (formato cartela):', jsonTeste);
             
             // Criar QR Code
             const qrContainer = document.createElement('div');

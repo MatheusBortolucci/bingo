@@ -3,53 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <title>Teste QR Code</title>
-    <script src="https://api.qrserver.com/v1/create-qr-code/?format=svg&size=200x200&data=teste" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 </head>
 <body>
-    <h2>Teste de QR Code das Cartelas</h2>
+    <h1>Teste QR Code</h1>
+    <div id="qrcode"></div>
+    <div id="qrcode2"></div>
     
-    <div id="resultado"></div>
-    
-    <button onclick="testarQRCartela()">Gerar QR como nas Cartelas</button>
-    <button onclick="testarQRTeste()">Gerar QR como no Teste</button>
-    
-    <script src="script.js"></script>
     <script>
-        function testarQRCartela() {
-            // Simular geração como nas cartelas
-            const itensCartela = ['Panela', 'Colher', 'Garfo', 'Faca'];
-            const dadosQR = gerarDadosQRCode(1, itensCartela);
-            
-            console.log('📦 Dados QR Cartela:', dadosQR);
-            
-            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(dadosQR)}`;
-            document.getElementById('resultado').innerHTML = `
-                <h3>QR da Cartela:</h3>
-                <img src="${qrUrl}" alt="QR Cartela">
-                <p>Dados: ${dadosQR}</p>
-            `;
+        console.log('QRCode disponível:', typeof QRCode !== 'undefined');
+        
+        if (typeof QRCode !== 'undefined') {
+            console.log('Gerando QR com biblioteca...');
+            new QRCode(document.getElementById("qrcode"), {
+                text: "Teste com biblioteca",
+                width: 100,
+                height: 100,
+                colorDark: '#000000',
+                colorLight: '#ffffff'
+            });
         }
         
-        function testarQRTeste() {
-            // Simular QR de teste
-            const dadosTeste = {
-                numero: 999,
-                evento: 'Chá de Panela da Mari',
-                timestamp: new Date().toISOString(),
-                itens: ['Panela', 'Colher', 'Garfo', 'Faca'],
-                hash: 'teste123'
-            };
-            
-            const jsonTeste = JSON.stringify(dadosTeste);
-            console.log('🧪 Dados QR Teste:', jsonTeste);
-            
-            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(jsonTeste)}`;
-            document.getElementById('resultado').innerHTML = `
-                <h3>QR de Teste:</h3>
-                <img src="${qrUrl}" alt="QR Teste">
-                <p>Dados: ${jsonTeste}</p>
-            `;
-        }
+        // Teste com API
+        console.log('Gerando QR com API...');
+        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent("Teste com API")}&color=000000&bgcolor=ffffff`;
+        document.getElementById("qrcode2").innerHTML = `<img src="${qrUrl}" alt="QR Code">`;
     </script>
 </body>
 </html>

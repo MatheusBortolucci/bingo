@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Teste QR Direto</title>
+    <style>
+        .teste { margin: 20px; padding: 20px; border: 2px solid #000; }
+        .qr-container { width: 60px; height: 60px; border: 1px solid red; margin: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Teste QR Direto</h1>
+    
+    <div class="teste">
+        <h3>Teste 1 - Direto na página</h3>
+        <div id="qr-teste-1" class="qr-container"></div>
+    </div>
+    
+    <div class="teste">
+        <h3>Teste 2 - Igual as cartelas</h3>
+        <div class="bingo-cell free-space qr-center" id="qr-cell-999">
+            <div class="qr-code-mini" id="qr-mini-999" class="qr-container"></div>
+        </div>
+    </div>
+    
+    <button onclick="testarQR()">🚀 Testar QR</button>
+    
+    <script>
+        function testarQR() {
+            console.log('🧪 TESTANDO QR CODES...');
+            
+            // Teste 1 - Direto
+            const elemento1 = document.getElementById('qr-teste-1');
+            if (elemento1) {
+                console.log('✅ Elemento 1 encontrado');
+                const url1 = 'https://api.qrserver.com/v1/create-qr-code/?size=50x50&data=TESTE1&color=000000&bgcolor=ffffff';
+                elemento1.innerHTML = `<img src="${url1}" style="width:50px;height:50px;" onload="console.log('QR 1 OK')" onerror="console.error('QR 1 ERRO')">`;
+            } else {
+                console.error('❌ Elemento 1 não encontrado');
+            }
+            
+            // Teste 2 - Igual cartela
+            const elemento2 = document.getElementById('qr-mini-999');
+            if (elemento2) {
+                console.log('✅ Elemento 2 encontrado');
+                const url2 = 'https://api.qrserver.com/v1/create-qr-code/?size=50x50&data=TESTE2&color=000000&bgcolor=ffffff';
+                elemento2.innerHTML = `<img src="${url2}" style="width:50px;height:50px;" onload="console.log('QR 2 OK')" onerror="console.error('QR 2 ERRO')">`;
+            } else {
+                console.error('❌ Elemento 2 não encontrado');
+            }
+            
+            // Teste 3 - Verificar se existe qr-mini-1 das cartelas
+            setTimeout(() => {
+                const elementoCartela = document.getElementById('qr-mini-1');
+                console.log('🔍 qr-mini-1 existe?', !!elementoCartela);
+                if (elementoCartela) {
+                    console.log('📦 Conteúdo atual:', elementoCartela.innerHTML);
+                }
+            }, 1000);
+        }
+        
+        // Testar automaticamente
+        setTimeout(testarQR, 500);
+    </script>
+</body>
+</html>
