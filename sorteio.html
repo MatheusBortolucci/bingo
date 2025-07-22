@@ -264,14 +264,11 @@
                 <div class="scanner-controls">
                     <button id="iniciarScanner" class="btn">📷 Iniciar Scanner</button>
                     <button id="pararScanner" class="btn secondary" style="display: none;">⏹️ Parar Scanner</button>
-                    <button id="testarValidacao" class="btn" style="background: linear-gradient(135deg, #9c27b0, #ba68c8);">🧪 Teste de Validação</button>
-                    <button id="debugDatabase" class="btn" style="background: linear-gradient(135deg, #ff5722, #ff7043);">🔍 Debug Database</button>
                 </div>
                 
                 <video id="scanner-video" autoplay playsinline></video>
                 
                 <div class="resultado-validacao" id="resultadoValidacao"></div>
-                <div class="cartela-info" id="cartelaInfo"></div>
             </div>
         </div>
     </div>
@@ -279,38 +276,41 @@
     <script>
         console.log('🚀 Carregando sistema de sorteio...');
         
-        // Array de itens do bingo (idêntico ao script-novo.js)
-        const itensBingo = [
-            // Talheres Básicos
-            "Garfo", "Faca", "Colher", "Colher de chá", "Faca de pão", "Garfo de sobremesa",
+        // MAPEAMENTO CHAVE-VALOR DOS ITENS (idêntico ao script-novo.js)
+        const itensMap = {
+            // Talheres Básicos (A1-A6)
+            "A1": "Garfo", "A2": "Faca", "A3": "Colher", "A4": "Colher de chá", "A5": "Faca de pão", "A6": "Garfo de sobremesa",
             
-            // Panelas e Frigideiras
-            "Panela de pressão", "Panela", "Frigideira", "Caçarola", "Leiteira", "Chaleira",
+            // Panelas e Frigideiras (B1-B6)
+            "B1": "Panela de pressão", "B2": "Panela", "B3": "Frigideira", "B4": "Caçarola", "B5": "Leiteira", "B6": "Chaleira",
             
-            // Utensílios Básicos de Cozinha
-            "Concha", "Escumadeira", "Espátula", "Colher de pau", "Batedor de ovos", "Pegador",
-            "Abridor de latas", "Saca-rolhas", "Descascador", "Ralador", "Peneira", "Coador",
-            "Tábua de corte", "Rolo de massa", "Funil",
+            // Utensílios Básicos de Cozinha (C1-C15)
+            "C1": "Concha", "C2": "Escumadeira", "C3": "Espátula", "C4": "Colher de pau", "C5": "Batedor de ovos", "C6": "Pegador",
+            "C7": "Abridor de latas", "C8": "Saca-rolhas", "C9": "Descascador", "C10": "Ralador", "C11": "Peneira", "C12": "Coador",
+            "C13": "Tábua de corte", "C14": "Rolo de massa", "C15": "Funil",
             
-            // Assadeiras e Formas
-            "Assadeira", "Forma de bolo", "Forma de pizza", "Forma de pão", "Refratário",
+            // Assadeiras e Formas (D1-D5)
+            "D1": "Assadeira", "D2": "Forma de bolo", "D3": "Forma de pizza", "D4": "Forma de pão", "D5": "Refratário",
             
-            // Eletrodomésticos Comuns
-            "Liquidificador", "Batedeira", "Torradeira", "Cafeteira", "Micro-ondas", "Mixer",
+            // Eletrodomésticos Comuns (E1-E6)
+            "E1": "Liquidificador", "E2": "Batedeira", "E3": "Torradeira", "E4": "Cafeteira", "E5": "Micro-ondas", "E6": "Mixer",
             
-            // Recipientes e Potes
-            "Tigela", "Jarra", "Potes", "Tupperware", "Garrafa térmica",
+            // Recipientes e Potes (F1-F5)
+            "F1": "Tigela", "F2": "Jarra", "F3": "Potes", "F4": "Tupperware", "F5": "Garrafa térmica",
             
-            // Itens para Servir
-            "Pratos", "Xícaras", "Copos", "Canecas", "Travessa", "Açucareiro", "Bule",
+            // Itens para Servir (G1-G7)
+            "G1": "Pratos", "G2": "Xícaras", "G3": "Copos", "G4": "Canecas", "G5": "Travessa", "G6": "Açucareiro", "G7": "Bule",
             
-            // Utensílios de Medição
-            "Balança", "Xícaras medidoras", "Timer",
+            // Utensílios de Medição (H1-H3)
+            "H1": "Balança", "H2": "Xícaras medidoras", "H3": "Timer",
             
-            // Itens Diversos
-            "Avental", "Luvas de forno", "Panos de prato", "Escorredor de louças", "Porta-talheres",
-            "Descanso de panela", "Guardanapos", "Papel toalha", "Papel alumínio", "Filme plástico"
-        ];
+            // Itens Diversos (I1-I10)
+            "I1": "Avental", "I2": "Luvas de forno", "I3": "Panos de prato", "I4": "Escorredor de louças", "I5": "Porta-talheres",
+            "I6": "Descanso de panela", "I7": "Guardanapos", "I8": "Papel toalha", "I9": "Papel alumínio", "I10": "Filme plástico"
+        };
+
+        // Array de itens do bingo (derivado do mapeamento)
+        const itensBingo = Object.values(itensMap);
 
         // Estado do jogo
         let itensSorteados = [];
@@ -361,8 +361,6 @@
             const reiniciarBtn = document.getElementById('reiniciarSorteio');
             const iniciarScannerBtn = document.getElementById('iniciarScanner');
             const pararScannerBtn = document.getElementById('pararScanner');
-            const testarBtn = document.getElementById('testarValidacao');
-            const debugBtn = document.getElementById('debugDatabase');
             
             if (sortearBtn) {
                 sortearBtn.addEventListener('click', function() {
@@ -394,22 +392,6 @@
                     pararScanner();
                 });
                 console.log('✅ Event listener do parar scanner configurado');
-            }
-            
-            if (testarBtn) {
-                testarBtn.addEventListener('click', function() {
-                    console.log('🧪 Botão teste clicado!');
-                    testarValidacao();
-                });
-                console.log('✅ Event listener do teste configurado');
-            }
-            
-            if (debugBtn) {
-                debugBtn.addEventListener('click', function() {
-                    console.log('🔍 Botão debug clicado!');
-                    debugDatabase();
-                });
-                console.log('✅ Event listener do debug configurado');
             }
             
             console.log('🎯 Todos os event listeners configurados!');
@@ -651,170 +633,78 @@
             try {
                 console.log('🔍 Validando cartela:', dadosQR);
                 
-                let cartelaId = dadosQR;
-                let dadosCartela = null;
+                let itensCartela = [];
                 
-                // TENTAR JSON PRIMEIRO (dados completos - funciona entre dispositivos)
-                try {
-                    dadosCartela = JSON.parse(dadosQR);
-                    cartelaId = dadosCartela.id || dadosCartela.hash || `Cartela-${dadosCartela.numero}`;
+                // DECODIFICAR QR CODE PARA OBTER OS ITENS
+                const dadosDecodificados = JSON.parse(dadosQR);
+                
+                // VERIFICAR SE SÃO DADOS COMPACTOS COM CHAVES
+                if (dadosDecodificados.k && Array.isArray(dadosDecodificados.k)) {
+                    // DECODIFICAR CHAVES PARA ITENS
+                    itensCartela = dadosDecodificados.k.map(chave => itensMap[chave]).filter(item => item);
+                    console.log(`🔑 Decodificado ${dadosDecodificados.k.length} chaves para ${itensCartela.length} itens`);
+                }
+                // DADOS COMPLETOS (formato antigo)
+                else if (dadosDecodificados.itens) {
+                    itensCartela = dadosDecodificados.itens;
                     console.log('✅ QR Code com dados completos detectado');
-                } catch (parseError) {
-                    // SE NÃO FOR JSON, TENTAR COMO ID SIMPLES (só funciona no mesmo dispositivo)
-                    if (typeof dadosQR === 'string' && dadosQR.match(/^MARI\d+/)) {
-                        console.log('🔍 Tentando buscar na base de dados local...');
-                        const database = JSON.parse(localStorage.getItem('cartelasDatabase') || '{}');
-                        dadosCartela = database[cartelaId];
-                        
-                        if (!dadosCartela) {
-                            throw new Error(`Cartela ${cartelaId} não encontrada na base de dados local. Use o mesmo dispositivo onde as cartelas foram geradas ou gere cartelas com QR codes completos.`);
-                        }
-                        console.log('✅ Cartela encontrada na base local');
-                    } else {
-                        throw new Error('QR Code inválido - não contém dados válidos');
-                    }
+                }
+                else {
+                    throw new Error('QR Code não contém dados de itens válidos');
                 }
 
-                // Verificar status da cartela
-                const itensCartela = dadosCartela.itens;
-                const cartelaSorteados = itensCartela.filter(item => itensSorteados.includes(item));
-                const cartelaNaoSorteados = itensCartela.filter(item => !itensSorteados.includes(item));
-                const isVencedor = cartelaNaoSorteados.length === 0;
+                // VERIFICAR SE CONSEGUIU OBTER OS ITENS
+                if (!itensCartela || itensCartela.length === 0) {
+                    throw new Error('Não foi possível extrair os itens da cartela');
+                }
 
-                // Mostrar resultado
+                // VERIFICAR QUAIS ITENS DA CARTELA AINDA NÃO FORAM SORTEADOS
+                const itensFaltando = itensCartela.filter(item => !itensSorteados.includes(item));
+                const isBingo = itensFaltando.length === 0;
+
+                // MOSTRAR RESULTADO SIMPLES E DIRETO
                 const resultadoDiv = document.getElementById('resultadoValidacao');
-                const infoDiv = document.getElementById('cartelaInfo');
                 
                 if (resultadoDiv) {
                     resultadoDiv.style.display = 'block';
                     
-                    if (isVencedor) {
+                    if (isBingo) {
                         resultadoDiv.className = 'resultado-validacao vencedor';
-                        resultadoDiv.innerHTML = '🎉 CARTELA VENCEDORA! 🎉<br>BINGO VÁLIDO!';
+                        resultadoDiv.innerHTML = '🎉🎉🎉 BINGOOOOO! 🎉🎉🎉<br><strong>CARTELA VENCEDORA!</strong>';
                         
+                        // Vibração no celular se disponível
                         if ('vibrate' in navigator) {
-                            navigator.vibrate([200, 100, 200]);
+                            navigator.vibrate([300, 100, 300, 100, 300]);
                         }
                     } else {
                         resultadoDiv.className = 'resultado-validacao perdedor';
-                        resultadoDiv.innerHTML = `❌ Cartela incompleta<br>Faltam ${cartelaNaoSorteados.length} item(ns)`;
+                        resultadoDiv.innerHTML = `❌ <strong>NÃO É BINGO</strong><br>Faltam ${itensFaltando.length} item(ns):<br><strong>${itensFaltando.join(', ')}</strong>`;
                     }
                 }
 
+                // ESCONDER DETALHES DESNECESSÁRIOS
+                const infoDiv = document.getElementById('cartelaInfo');
                 if (infoDiv) {
-                    const progresso = Math.round((cartelaSorteados.length / itensCartela.length) * 100);
-                    
-                    infoDiv.style.display = 'block';
-                    infoDiv.innerHTML = `
-                        <h4>📋 Cartela ${dadosCartela.numero}</h4>
-                        <p><strong>ID:</strong> ${cartelaId}</p>
-                        <p><strong>Progresso:</strong> ${progresso}% (${cartelaSorteados.length}/${itensCartela.length})</p>
-                        <p><strong>Fonte:</strong> ${dadosCartela.evento || 'N/A'}</p>
-                        
-                        <h5>✅ Itens sorteados (${cartelaSorteados.length}):</h5>
-                        <p>${cartelaSorteados.join(', ') || 'Nenhum'}</p>
-                        
-                        ${cartelaNaoSorteados.length > 0 ? `
-                        <h5>⏳ Itens restantes (${cartelaNaoSorteados.length}):</h5>
-                        <p>${cartelaNaoSorteados.join(', ')}</p>
-                        ` : ''}
-                    `;
+                    infoDiv.style.display = 'none';
                 }
 
-                console.log(`✅ Validação concluída: ${isVencedor ? 'VENCEDOR' : 'INCOMPLETA'}`);
+                console.log(`✅ Validação: ${isBingo ? 'BINGO!' : `Faltam ${itensFaltando.length} itens: ${itensFaltando.join(', ')}`}`);
 
             } catch (error) {
                 console.error('❌ Erro na validação:', error);
                 
                 const resultadoDiv = document.getElementById('resultadoValidacao');
-                const infoDiv = document.getElementById('cartelaInfo');
-                
                 if (resultadoDiv) {
                     resultadoDiv.style.display = 'block';
                     resultadoDiv.className = 'resultado-validacao perdedor';
-                    resultadoDiv.innerHTML = `❌ Erro: ${error.message}`;
+                    resultadoDiv.innerHTML = `❌ <strong>QR Code inválido</strong><br>Não foi possível ler a cartela`;
                 }
                 
+                // ESCONDER DETALHES DE ERRO
+                const infoDiv = document.getElementById('cartelaInfo');
                 if (infoDiv) {
-                    infoDiv.style.display = 'block';
-                    infoDiv.innerHTML = `
-                        <h4>⚠️ Erro na Validação</h4>
-                        <p>QR Code inválido ou cartela não encontrada</p>
-                        <p><strong>Erro:</strong> ${error.message}</p>
-                        <p><strong>Dica:</strong> Se as cartelas foram geradas em outro dispositivo, certifique-se de que foram geradas com a versão atualizada que inclui dados completos no QR Code.</p>
-                        <details>
-                            <summary>Dados recebidos (clique para expandir)</summary>
-                            <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px; font-size: 12px; overflow-x: auto;">${dadosQR.substring(0, 300)}...</pre>
-                        </details>
-                    `;
+                    infoDiv.style.display = 'none';
                 }
-            }
-        }
-
-        // ========== FUNÇÃO DE TESTE/DEBUG ==========
-        
-        function testarValidacao() {
-            console.log('🧪 Iniciando teste de validação...');
-            
-            // Criar uma cartela de teste com dados completos (simulando QR code cross-device)
-            const cartelaIdTeste = 'MARI01TEST';
-            const itensTeste = itensBingo.slice(0, 24); // Primeiros 24 itens
-            
-            const cartelaTeste = {
-                id: cartelaIdTeste,
-                numero: 1,
-                itens: itensTeste,
-                evento: 'Chá de Panela da Mari - TESTE',
-                criadaEm: new Date().toISOString()
-            };
-            
-            console.log('✅ Cartela de teste criada:', cartelaTeste);
-            
-            // Simular QR code com dados completos (como seria entre dispositivos)
-            const qrCompleto = JSON.stringify(cartelaTeste);
-            console.log('📱 Simulando scan de QR code com dados completos...');
-            
-            // Testar validação
-            validarCartela(qrCompleto);
-        }
-
-        function debugDatabase() {
-            console.log('🔍 DEBUG: Verificando base de dados...');
-            
-            const database = JSON.parse(localStorage.getItem('cartelasDatabase') || '{}');
-            const chaves = Object.keys(database);
-            
-            console.log('📊 Total de cartelas:', chaves.length);
-            console.log('🔑 IDs das cartelas:', chaves);
-            
-            if (chaves.length > 0) {
-                console.log('📋 Primeira cartela como exemplo:', database[chaves[0]]);
-            }
-            
-            const resultadoDiv = document.getElementById('resultadoValidacao');
-            const infoDiv = document.getElementById('cartelaInfo');
-            
-            if (resultadoDiv) {
-                resultadoDiv.style.display = 'block';
-                resultadoDiv.className = 'resultado-validacao';
-                resultadoDiv.style.background = '#f0f0f0';
-                resultadoDiv.style.color = '#333';
-                resultadoDiv.innerHTML = `
-                    📊 <strong>DEBUG - Base de Dados</strong><br>
-                    Total de cartelas: ${chaves.length}<br>
-                    ${chaves.length > 0 ? 'Status: ✅ OK' : 'Status: ❌ Vazia'}
-                `;
-            }
-            
-            if (infoDiv && chaves.length > 0) {
-                infoDiv.style.display = 'block';
-                infoDiv.innerHTML = `
-                    <h4>🔍 Análise da Base de Dados</h4>
-                    <p><strong>Total:</strong> ${chaves.length} cartelas</p>
-                    <p><strong>IDs:</strong> ${chaves.slice(0, 5).join(', ')}${chaves.length > 5 ? '...' : ''}</p>
-                    <p><strong>Exemplo de estrutura:</strong></p>
-                    <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px; font-size: 12px; overflow-x: auto;">${JSON.stringify(database[chaves[0]], null, 2)}</pre>
-                `;
             }
         }
 
